@@ -1,0 +1,11 @@
+Host: ec2-54-152-40-168.compute-1.amazonaws.com
+Database: d69f8sptghs3ev
+Port: 5432
+User: ctozguylmpohhh
+Password: 0a5eab1011e400db3abdd56619fd04bb48a7ce8e06084c7da3f6cce201e405b0
+
+ec2-54-152-40-168.compute-1.amazonaws.com
+d69f8sptghs3ev
+5432
+ctozguylmpohhh
+0a5eab1011e400db3abdd56619fd04bb48a7ce8e06084c7da3f6cce201e405b0

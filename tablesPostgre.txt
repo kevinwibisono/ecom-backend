@@ -1,0 +1,75 @@
+CREATE TABLE user(
+  id_user serial PRIMARY KEY NOT NULL,
+  email varchar(30) NOT NULL,
+  no_hp varchar(30) NOT NULL,
+  nama varchar(30) NOT NULL,
+  password varchar(30) NOT NULL,
+  created_at date NOT NULL,
+  tipe_user integer NOT NULL,
+  skillset text NOT NULL,
+  bio text NOT NULL,
+  photo_dir varchar(100) NOT NULL,
+  education text NOT NULL
+);
+
+CREATE TABLE gigs(
+  id_gigs serial PRIMARY KEY NOT NULL,
+  id_user integer NOT NULL,
+  harga integer NOT NULL,
+  description text,
+  duration integer NOT NULL,
+  gigs_status integer NOT NULL
+);
+
+CREATE TABLE faq(
+  id_faq serial PRIMARY KEY NOT NULL,
+  id_gigs integer NOT NULL,
+  question text NOT NULL,
+  answer text NOT NULL
+);
+
+CREATE TABLE reviews(
+  id_review serial PRIMARY KEY NOT NULL,
+  id_user integer NOT NULL,
+  id_reviewer integer NOT NULL,
+  id_gigs integer NOT NULL,
+  rating integer NOT NULL,
+  comment text,
+  created_at date NOT NULL
+);
+
+CREATE TABLE request(
+  id_req serial PRIMARY KEY NOT NULL,
+  isi_req integer NOT NULL,
+  skillset text NOT NULL,
+  batas_waktu date NOT NULL,
+  duration integer NOT NULL,
+  budget integer NOT NULL
+);
+
+CREATE TABLE transaksi(
+  id_transaksi serial PRIMARY KEY NOT NULL,
+  id_seller integer NOT NULL,
+  id_buyer integer NOT NULL,
+  tgl_transaksi date NOT NULL,
+  tgl_selesai date NOT NULL,
+  directory_file varchar(100) NOT NULL,
+  status_transaksi integer NOT NULL,
+  total integer NOT NULL
+);
+
+CREATE TABLE revisi(
+  id_revisi serial PRIMARY KEY NOT NULL,
+  id_transaksi integer NOT NULL,
+  tgl_revisi date NOT NULL,
+  alasan_revisi text NOT NULL,
+  directory_file_revisi varchar(100) NOT NULL
+);
+
+CREATE TABLE chat(
+  id_chat serial PRIMARY KEY NOT NULL,
+  id_user1 integer NOT NULL,
+  id_user2 integer NOT NULL,
+  timestamp date NOT NULL,
+  message text NOT NULL
+);
