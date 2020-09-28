@@ -1,4 +1,4 @@
-CREATE TABLE user(
+CREATE TABLE user_table(
   id_user serial PRIMARY KEY NOT NULL,
   email varchar(30) NOT NULL,
   no_hp varchar(30) NOT NULL,
@@ -6,10 +6,10 @@ CREATE TABLE user(
   password varchar(30) NOT NULL,
   created_at date NOT NULL,
   tipe_user integer NOT NULL,
-  skillset text NOT NULL,
-  bio text NOT NULL,
-  photo_dir varchar(100) NOT NULL,
-  education text NOT NULL
+  skillset text,
+  bio text,
+  photo_dir varchar(100),
+  education text
 );
 
 CREATE TABLE gigs(
@@ -63,7 +63,7 @@ CREATE TABLE revisi(
   id_transaksi integer NOT NULL,
   tgl_revisi date NOT NULL,
   alasan_revisi text NOT NULL,
-  directory_file_revisi varchar(100) NOT NULL
+  directory_file_revisi varchar(100)
 );
 
 CREATE TABLE chat(
@@ -72,4 +72,10 @@ CREATE TABLE chat(
   id_user2 integer NOT NULL,
   timestamp date NOT NULL,
   message text NOT NULL
+);
+
+CREATE TABLE favorit(
+  id_favorit serial PRIMARY KEY NOT NULL,
+  id_gigs integer NOT NULL,
+  id_user integer NOT NULL
 );
