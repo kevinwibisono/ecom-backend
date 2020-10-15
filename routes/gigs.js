@@ -12,9 +12,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 router.get("/search", function(req, res){
     //search gigs tertentu
     //bisa menyertakan params seperti query, filter & sort type
-    //jika mengandung parameter query, maka tampilkan category pada filter
-      //jika tidak, tidak perlu menampilkan category sebagai filter
-    
+    var nama = req.body.nama;
+    var category = req.body.category;
+    var query = "SELECT * FROM gigs WHERE ";
+    if(nama != ""){
+      query = ` judul_gigs LIKE '%${nama}%'`;
+    }
+    if(category != ""){
+      if(nama != "") query = query + ` AND category = '${category}'`;
+      else `category = '${category}'`;
+    }
+    var hasil = await db.executeQuery(query);
+    res.send(hasil);
 });
 
 router.get("/detail/:id", function(req, res){
@@ -41,12 +50,13 @@ router.post("/add", async function(req, res){
   var duration = req.body.duration;
   var category = req.body.category;
   var sub_category = req.body.sub_category;
+  var judul = req.body.judul_gigs;
   var query = "";
   if(desc != ""){
-    query = `INSERT INTO gigs VALUES(0,${user},${harga},'${desc}',${duration},1,'${category}','${sub_category}'))`;
+    query = `INSERT INTO gigs VALUES(0,${user},${harga},'${desc}',${duration},1,'${category}','${sub_category}','${judul}'))`;
   }
   else{
-    query = `INSERT INTO gigs VALUES(0,${user},${harga},'',${duration},1,'${category}','${sub_category}')`;
+    query = `INSERT INTO gigs VALUES(0,${user},${harga},'',${duration},1,'${category}','${sub_category}','${judul}')`;
   }
   var hasil = await db.executeQuery(query);
   if(hasil){
