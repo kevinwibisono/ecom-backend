@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-router.get("/search", function(req, res){
+router.get("/search", async function(req, res){
     //search gigs tertentu
     //bisa menyertakan params seperti query, filter & sort type
     var nama = req.body.nama;

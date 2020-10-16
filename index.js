@@ -1,5 +1,5 @@
 const express = require("express");
-require('dotenv').config()
+require('dotenv').config();
 const user = require("./routes/user");
 const gigs = require("./routes/gigs");
 const request = require("./routes/request");
