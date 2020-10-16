@@ -10,8 +10,8 @@ const chat = require("./routes/chat");
 const favorit = require("./routes/favorit");
 const app = express();
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use("/user", user);
 app.use("/gigs", gigs);
 app.use("/request", request);

@@ -1,0 +1,9 @@
+INSERT INTO subcategories VALUES ('Logo & Brand Identity', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Art & Ilustration', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Packaging & Label', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Logo & Brand Identity', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Architecture & Building Design', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Product & Character Design', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Print Design', 'Graphic & Design');
+INSERT INTO subcategories VALUES ('Other', 'Graphic & Design');
+
