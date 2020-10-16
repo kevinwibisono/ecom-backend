@@ -1,13 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
-const app = express();
-const bodyParser = require('body-parser');
-
-app.use(express.json());
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 function getDate(){
   let now = new Date();
@@ -40,7 +33,7 @@ router.post("/login", async function(req, res){
       res.status(401).send("User tidak ditemukan!");
     }
     else{
-      res.status(201).send(hasil[0].id_user);
+      res.status(201).send(hasil[0].id_user.toString());
     }
 });
 

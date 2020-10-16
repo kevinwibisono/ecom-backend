@@ -1,13 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
-const app = express();
-const bodyParser = require('body-parser');
-
-app.use(express.json());
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 router.get("/search", async function(req, res){
     //search gigs tertentu
@@ -60,10 +53,10 @@ router.post("/add", async function(req, res){
   }
   var hasil = await db.executeQuery(query);
   if(hasil){
-    res.send("Berhasil tambah gigs");
+    res.send("Gigs Added Successfully");
   }
   else{
-    res.status(401).send("Gagal tambah gigs!");
+    res.status(401).send("Failed To Add Gigs");
   }
 });
 
@@ -73,10 +66,10 @@ router.post("/addfaq", async function(req, res){
   var answer = req.body.answer;
   var hasil = await db.executeQuery(`INSERT INTO faq VALUES(0,${id_gigs},'${question}','${answer}')`);
   if(hasil){
-    res.send("Berhasil tambah FAQ");
+    res.send("FAQ Added Successfully");
   }
   else{
-    res.status(401).send("Gagal tambah FAQ");
+    res.status(401).send("Failed To Add FAQ");
   }
 });
 
@@ -118,17 +111,17 @@ router.put("/update/:id_gigs", async function(req, res){
       res.send("Berhasil update gigs");
     }
     else{
-      res.status(401).send("Gagal update gigs!");
+      res.status(401).send("Failed To Update Gigs");
     }
   }
   else{
-    res.status(401).send("User tidak memiliki hak akses untuk mengupdate gigs!");
+    res.status(401).send("You Don't Have Privilege To Update This Gig");
   }
   
 });
 
 router.delete("/delete/:id_gigs",async function(req, res){
-  //update gigs dengan data-data baru
+  //delete suatu gigs
   var id = req.params.id_gigs;
   var query = `DELETE FROM gigs_picture WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
@@ -140,7 +133,7 @@ router.delete("/delete/:id_gigs",async function(req, res){
   await db.executeQuery(query);
   query = `DELETE FROM gigs WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
-  res.send("Berhasil hapus gigs!");
+  res.send("Gigs Deleted Successfully");
 });
 
 module.exports = router;

@@ -1,13 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
-const app = express();
-const bodyParser = require('body-parser');
-
-app.use(express.json());
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 router.get("/list/:id_user",async function(req, res){
   //mendapatkan daftar gigs favorit milik user tertentu
