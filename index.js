@@ -26,8 +26,6 @@ app.get("/", function(req, res){
     res.status(200).send("Ini halaman awal");
 });
 
-process.env.PORT = 3000;
-
 app.listen(process.env.PORT, function(){
     console.log("Listening to port "+ process.env.PORT);
 });
