@@ -14,7 +14,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:5000/chat/list/?id_user=3",
+							"raw": "http://localhost:5000/chat/list/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -23,13 +23,7 @@
 							"path": [
 								"chat",
 								"list",
-								""
-							],
-							"query": [
-								{
-									"key": "id_user",
-									"value": "3"
-								}
+								"3"
 							]
 						}
 					},
@@ -45,7 +39,7 @@
 							"urlencoded": [
 								{
 									"key": "id_user1",
-									"value": "1",
+									"value": "4",
 									"type": "text"
 								},
 								{
@@ -55,7 +49,7 @@
 								},
 								{
 									"key": "message",
-									"value": "coba",
+									"value": "coba dari 4 ke 3",
 									"type": "text"
 								}
 							]
