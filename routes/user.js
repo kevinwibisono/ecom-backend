@@ -15,12 +15,19 @@ router.post("/register", async function(req, res){
   var password = req.body.password;
   var alamat = req.body.alamat;
   var negara = req.body.negara;
-  var hasil = await db.executeQuery(`INSERT INTO user_table (email,no_hp,nama,password,tipe_user,alamat,negara,created_at) VALUES ('${email}','${no_hp}','${nama}','${password}','1','${alamat}','${negara}',TO_DATE('${getDate()}','dd/MM/yyyy'))`);
-  if(hasil){
-    res.send("Berhasil tambah user");
+  if(email == '' || password == '' || no_hp == '' || nama == '' || alamat == '' || negara == ''){
+    res.status(400).send('Field-field tidak boleh kosong');
   }
   else{
-    res.status(401).send("Gagal tambah user");
+    var emailSearch = await db.executeQuery(`SELECT * FROM user_table WHERE email = '${email}'`);
+    if(emailSearch.length <= 0){
+      await db.executeQuery(`INSERT INTO user_table (email,no_hp,nama,password,tipe_user,alamat,negara,created_at) VALUES ('${email}','${no_hp}','${nama}','${password}','1','${alamat}','${negara}',TO_DATE('${getDate()}','dd/MM/yyyy'))`);
+      var user = await db.executeQuery(`SELECT * FROM user_table WHERE email = '${email}'`);
+      res.status(200).send(user);
+    }
+    else{
+      res.status(400).send('Email Is Already Used');
+    }
   }
 });
 
