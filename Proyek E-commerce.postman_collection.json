@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "716cfdbe-5922-43fe-baa0-e1c7d874f33e",
+		"_postman_id": "a37a0d10-757c-4a69-89e6-21cf677c40ab",
 		"name": "Proyek E-commerce",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,23 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "http://localhost:5000/chat/list/?id_user=3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"chat",
+								"list",
+								""
+							],
+							"query": [
+								{
+									"key": "id_user",
+									"value": "3"
+								}
+							]
 						}
 					},
 					"response": []
