@@ -18,6 +18,7 @@ CREATE TABLE gigs(
   id_gigs serial PRIMARY KEY NOT NULL,
   id_user integer NOT NULL,
   harga integer NOT NULL,
+  judul varchar(100) NOT NULL,
   description text,
   duration integer NOT NULL,
   gigs_status integer NOT NULL,
