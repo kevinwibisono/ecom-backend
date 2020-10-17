@@ -33,7 +33,7 @@ router.post("/login", async function(req, res){
       res.status(401).send("User tidak ditemukan!");
     }
     else{
-      res.status(201).send(hasil[0].id_user.toString());
+      res.status(201).send(hasil[0]);
     }
 });
 
