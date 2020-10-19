@@ -50,13 +50,12 @@ CREATE TABLE reviews(
 
 CREATE TABLE request(
   id_req serial PRIMARY KEY NOT NULL,
-  id_user integer NOT NULL,
   isi_req text NOT NULL,
   skillset text NOT NULL,
   batas_waktu date NOT NULL,
   duration integer NOT NULL,
   budget integer NOT NULL,
-  status integer NOT NULL
+  id_user integer NOT NULL
 );
 
 CREATE TABLE transaksi(
