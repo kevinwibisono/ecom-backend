@@ -136,4 +136,9 @@ router.delete("/delete/:id_gigs",async function(req, res){
   res.send("Gigs Deleted Successfully");
 });
 
+router.get("/subcategories", async function(req, res){
+  var result = await db.executeQuery(`SELECT sub_category FROM subcategories WHERE category = '${req.body.category}'`);
+  res.status(200).send(result);
+});
+
 module.exports = router;
