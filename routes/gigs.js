@@ -8,12 +8,12 @@ router.get("/search", async function(req, res){
     var nama = req.body.nama;
     var category = req.body.category;
     var query = "SELECT * FROM gigs WHERE ";
-    if(nama != ""){
-      query = ` judul_gigs LIKE '%${nama}%'`;
+    if(nama != "" && nama != undefined){
+      query = query + `judul LIKE '%${nama}%'`;
     }
-    if(category != ""){
-      if(nama != "") query = query + ` AND category = '${category}'`;
-      else `category = '${category}'`;
+    if(category != "" && category != undefined){
+      if(nama != "" && nama != undefined) query = query + ` AND category = '${category}'`;
+      else query = query + `category = '${category}'`;
     }
     var hasil = await db.executeQuery(query);
     res.send(hasil);
