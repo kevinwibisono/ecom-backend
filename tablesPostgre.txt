@@ -22,7 +22,7 @@ CREATE TABLE gigs(
   description text,
   duration integer NOT NULL,
   gigs_status integer NOT NULL,
-  category varchar(30) NOT NULL,
+  category integer NOT NULL,
   sub_category varchar(100) NOT NULL
 );
 
@@ -92,5 +92,5 @@ CREATE TABLE favorit(
 
 CREATE TABLE subcategories(
   sub_category varchar(100) NOT NULL,
-  category varchar(30) NOT NULL
+  category integer NOT NULL
 );

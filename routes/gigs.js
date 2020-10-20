@@ -7,14 +7,16 @@ router.get("/search", async function(req, res){
     //bisa menyertakan params seperti query, filter & sort type
     var nama = req.body.nama;
     var category = req.body.category;
-    var query = "SELECT * FROM gigs WHERE ";
+    console.log(category);
+    var query = "SELECT * FROM gigs";
     if(nama != "" && nama != undefined){
-      query = query + `judul LIKE '%${nama}%'`;
+      query = query + ` WHERE judul LIKE '%${nama}%'`;
     }
     if(category != "" && category != undefined){
-      if(nama != "" && nama != undefined) query = query + ` AND category = '${category}'`;
-      else query = query + `category = '${category}'`;
+      if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
+      else query = query + ` WHERE category = ${category}`;
     }
+    console.log(query);
     var hasil = await db.executeQuery(query);
     if(hasil.length > 0){
       for (let index = 0; index < hasil.length; index++) {
