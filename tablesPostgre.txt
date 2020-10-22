@@ -9,16 +9,26 @@ CREATE TABLE user_table(
   skillset text,
   bio text,
   photo_dir varchar(100),
-  education text
+  education text,
+  alamat varchar(100),
+  negara varchar(30)
 );
 
 CREATE TABLE gigs(
   id_gigs serial PRIMARY KEY NOT NULL,
   id_user integer NOT NULL,
   harga integer NOT NULL,
+  judul varchar(100) NOT NULL,
   description text,
   duration integer NOT NULL,
-  gigs_status integer NOT NULL
+  gigs_status integer NOT NULL,
+  category varchar(30) NOT NULL,
+  sub_category varchar(100) NOT NULL
+);
+
+CREATE TABLE gigs_pictures(
+  id_gigs integer NOT NULL,
+  directory_file varchar(100) NOT NULL
 );
 
 CREATE TABLE faq(
@@ -40,11 +50,13 @@ CREATE TABLE reviews(
 
 CREATE TABLE request(
   id_req serial PRIMARY KEY NOT NULL,
-  isi_req integer NOT NULL,
+  id_user integer NOT NULL,
+  isi_req text NOT NULL,
   skillset text NOT NULL,
   batas_waktu date NOT NULL,
   duration integer NOT NULL,
-  budget integer NOT NULL
+  budget integer NOT NULL,
+  status integer NOT NULL
 );
 
 CREATE TABLE transaksi(
@@ -75,7 +87,11 @@ CREATE TABLE chat(
 );
 
 CREATE TABLE favorit(
-  id_favorit serial PRIMARY KEY NOT NULL,
   id_gigs integer NOT NULL,
   id_user integer NOT NULL
+);
+
+CREATE TABLE subcategories(
+  sub_category varchar(100) NOT NULL,
+  category varchar(30) NOT NULL
 );

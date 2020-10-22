@@ -1,6 +1,7 @@
 const express = require("express");
-require('dotenv').config()
+require('dotenv').config();
 const user = require("./routes/user");
+const cors = require("cors");
 const gigs = require("./routes/gigs");
 const request = require("./routes/request");
 const transaksi = require("./routes/transaksi");
@@ -9,7 +10,9 @@ const chat = require("./routes/chat");
 const favorit = require("./routes/favorit");
 const app = express();
 
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use("/user", user);
 app.use("/gigs", gigs);
 app.use("/request", request);
