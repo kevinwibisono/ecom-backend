@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
 
-router.get("/search", async function(req, res){
+router.post("/search", async function(req, res){
     //search gigs tertentu
     //bisa menyertakan params seperti query, filter & sort type
     var nama = req.body.nama;
@@ -10,7 +10,7 @@ router.get("/search", async function(req, res){
     console.log(category);
     var query = "SELECT * FROM gigs";
     if(nama != "" && nama != undefined){
-      query = query + ` WHERE judul LIKE '%${nama}%'`;
+      query = query + ` WHERE LOWER(judul) ILIKE '%${nama}%'`;
     }
     if(category != "" && category != undefined){
       if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
