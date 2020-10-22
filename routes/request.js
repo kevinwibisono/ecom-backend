@@ -18,9 +18,14 @@ router.post("/add",async function(req, res){
     var duration = req.body.duration;
     var budget = req.body.budget;
     var id_user = req.body.id_user;
-    var query = `INSERT INTO request VALUES (0,'${isi}','${skillset}',TO_DATE('${batas}','dd/MM/yyyy'), ${duration},${budget},${id_user})`;
-    await db.executeQuery(query);
-    res.send("Berhasil tambah request!");
+    if(isi == "" || skillset == "" || batas == "" || duration == "" || budget == ""){
+        res.status(400).send("Field tidak boleh kosong");
+    }
+    else{
+        var query = `INSERT INTO request (isi_req, skillset, batas_waktu, duration, budget, id_user) VALUES ('${isi}','${skillset}',TO_DATE('${batas}','dd/MM/yyyy'), ${duration}, ${budget}, ${id_user})`;
+        await db.executeQuery(query);
+        res.status(200).send("Berhasil tambah request!");
+    }
 });
 
 router.put("/update/:id_req",async function(req, res){

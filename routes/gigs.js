@@ -7,23 +7,36 @@ router.get("/search", async function(req, res){
     //bisa menyertakan params seperti query, filter & sort type
     var nama = req.body.nama;
     var category = req.body.category;
-    var query = "SELECT * FROM gigs WHERE ";
-    if(nama != ""){
-      query = ` judul_gigs LIKE '%${nama}%'`;
+    console.log(category);
+    var query = "SELECT * FROM gigs";
+    if(nama != "" && nama != undefined){
+      query = query + ` WHERE judul LIKE '%${nama}%'`;
     }
-    if(category != ""){
-      if(nama != "") query = query + ` AND category = '${category}'`;
-      else `category = '${category}'`;
+    if(category != "" && category != undefined){
+      if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
+      else query = query + ` WHERE category = ${category}`;
     }
+    console.log(query);
     var hasil = await db.executeQuery(query);
+    if(hasil.length > 0){
+      for (let index = 0; index < hasil.length; index++) {
+        query = `SELECT g.id_gigs, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user group by g.id_gigs, u.id_user, u.nama;`;
+        var searched_gig = await db.executeQuery(query);
+        hasil[index].nama_user = searched_gig[0].nama;
+        hasil[index].rating = searched_gig[0].rating;
+        hasil[index].reviews = searched_gig[0].reviews;
+      }
+    }
     res.send(hasil);
 });
 
-router.get("/detail/:id", function(req, res){
+router.get("/detail/:id", async function(req, res){
   //mendapatkan detail gigs dengan id tertentu
   //termasuk mendapatkan review, penyedia jasa & faq dengan id gigs tersebut
   //hasil res.send akan mengembalikan object gigs dimana dalamnya terdapat array of reviews + array of faq
-
+  var id_gigs = req.params.id;
+  var hasil = await db.executeQuery("SELECT * FROM gigs WHERE id_gigs = "+id_gigs);
+  res.status(200).send(hasil[0]);
 });
 
 router.get("/list/:id_user", async function(req, res){
@@ -134,6 +147,11 @@ router.delete("/delete/:id_gigs",async function(req, res){
   query = `DELETE FROM gigs WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
   res.send("Gigs Deleted Successfully");
+});
+
+router.get("/subcategories", async function(req, res){
+  var result = await db.executeQuery(`SELECT sub_category FROM subcategories WHERE category = '${req.body.category}'`);
+  res.status(200).send(result);
 });
 
 module.exports = router;

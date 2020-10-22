@@ -1,0 +1,162 @@
+--SUBCATEGORIES
+
+INSERT INTO subcategories VALUES ('Logo & Brand Identity', 0);
+INSERT INTO subcategories VALUES ('Art & Illustration', 0);
+INSERT INTO subcategories VALUES ('Packaging & Label', 0);
+INSERT INTO subcategories VALUES ('Architecture & Building Design', 0);
+INSERT INTO subcategories VALUES ('Product & Character Design', 0);
+INSERT INTO subcategories VALUES ('Print Design', 0);
+INSERT INTO subcategories VALUES ('Other', 0);
+
+INSERT INTO subcategories VALUES ('Social Media Marketing', 1);
+INSERT INTO subcategories VALUES ('Marketing Strategy', 1);
+INSERT INTO subcategories VALUES ('Video Marketing', 1);
+INSERT INTO subcategories VALUES ('Web Analytics', 1);
+INSERT INTO subcategories VALUES ('Influencer Marketing', 1);
+INSERT INTO subcategories VALUES ('Other', 1);
+
+INSERT INTO subcategories VALUES ('Articles & Blog Posts', 2);
+INSERT INTO subcategories VALUES ('Translation', 2);
+INSERT INTO subcategories VALUES ('Proofreading & Editing', 2);
+INSERT INTO subcategories VALUES ('Resume Writing', 2);
+INSERT INTO subcategories VALUES ('Linkedin Profile', 2);
+INSERT INTO subcategories VALUES ('Book & eBook Writing', 2);
+INSERT INTO subcategories VALUES ('Website Content', 2);
+INSERT INTO subcategories VALUES ('Other', 2);
+
+INSERT INTO subcategories VALUES ('Video Editing', 3);
+INSERT INTO subcategories VALUES ('Video Ads', 3);
+INSERT INTO subcategories VALUES ('Lyric & Music Videos', 3);
+INSERT INTO subcategories VALUES ('Logo Animation', 3);
+INSERT INTO subcategories VALUES ('3D Product Animation', 3);
+INSERT INTO subcategories VALUES ('Visual Effects', 3);
+INSERT INTO subcategories VALUES ('Subtitles & Captions', 3);
+INSERT INTO subcategories VALUES ('Other', 3);
+
+INSERT INTO subcategories VALUES ('Voice Over', 4);
+INSERT INTO subcategories VALUES ('Producers & Composers', 4);
+INSERT INTO subcategories VALUES ('Singers & Vocalists', 4);
+INSERT INTO subcategories VALUES ('Mixing & Mastering', 4);
+INSERT INTO subcategories VALUES ('Songwriters', 4);
+INSERT INTO subcategories VALUES ('Other', 4);
+
+INSERT INTO subcategories VALUES ('Wordpress', 5);
+INSERT INTO subcategories VALUES ('Game Development', 5);
+INSERT INTO subcategories VALUES ('Web Programming', 5);
+INSERT INTO subcategories VALUES ('E-Commerce Development', 5);
+INSERT INTO subcategories VALUES ('Mobile Apps', 5);
+INSERT INTO subcategories VALUES ('Dekstop Applications', 5);
+INSERT INTO subcategories VALUES ('Support & IT', 5);
+INSERT INTO subcategories VALUES ('Convert Files', 5);
+INSERT INTO subcategories VALUES ('Other', 5);
+
+INSERT INTO subcategories VALUES ('E-Commerce Management', 6);
+INSERT INTO subcategories VALUES ('Data Entry', 6);
+INSERT INTO subcategories VALUES ('Market Research', 6);
+INSERT INTO subcategories VALUES ('Career Counseling', 6);
+INSERT INTO subcategories VALUES ('Business Plans', 6);
+INSERT INTO subcategories VALUES ('Other', 6);
+
+INSERT INTO subcategories VALUES ('Gaming', 6);
+INSERT INTO subcategories VALUES ('Astrology & Psychics', 6);
+INSERT INTO subcategories VALUES ('Health, Nutrition & Fitness', 6);
+INSERT INTO subcategories VALUES ('Travelling', 6);
+INSERT INTO subcategories VALUES ('Relationship Advise', 6);
+INSERT INTO subcategories VALUES ('Other', 6);
+
+--GIGS
+
+--Graphic & Design
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will create a flat minimalist logo design in 24 hours', 'Are You Looking For Creative And Minimalist Logo Design? You Are At The Perfect Place For All Types Of Creative Logo Design. We Understand The Value Of Your Logo And Surely Create A Unique Design As Per Your Requirement From Scratch.', 1, 1, 0, 'Logo & Brand Identity');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 150000, 'I will paint sci fi or fantasy concept art illustration characters', 'I will draw or paint what you need. I can design it from scratch but if you already have an idea, that''s cool too. Sometimes you may have trouble picturing out things, so let me help you with that.', 2, 1, 0, 'Art & Illustration');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 300000, 'I will create interior 3d modeling and rendering', 'You share with us your idea, concept sketch, material, reference images or just simply explain to us what you expect and we''ll do 3d rendering of your project. Let''s do some cool stuff together. Please contact us before ordering. We would like to discuss the details first and agree on what exactly you expect before we''ll start our work. And feel free to ask us if you have any questions. THANKS!', 3, 1, 0, 'Architecture & Building Design');
+
+
+
+--Digital Marketing
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 500000, 'I will organically promote your youtube video and make it rank on page 1', 'I will optimize your YouTube Video of any length and make it rank GUARANTEED on Page 1 of keywords relevant to your target audience for 7 DAYS!!!. You will get the best video SEO service (Optimization) & 100% satisfaction guarantee out of my service!', 9, 1, 1, 'Video Marketing');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will set up goals in google analytics within 24 hours', 'So you have a form that doesn''t have a thank-you page after submission? Or want to know how many people click on Email, phone number or any other button on your website? With this tracking, you''ll learn from where these visitors are coming who performed this action which you want from them, So that you can make an informed decision about your marketing efforts & spending strategy in google ads to performing campaigns, ad groups, ads, and keywords.', 1, 1, 1, 'Web Analytics');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 250000, 'I will grow your instagram post exposure', 'There are many ways to promote your Instagram posts; however, most of them come under two categories--Black hat methods and White hat methods. Black hat means illegal ways to promote your photos or account such as fake likes, sending bots, and others bad ways that would lead to your account ban. On the other hand, white hat methods are effective ways to promote your content/pic/posts/account such as creating Instagram/Facebook ads, shout outs from influencers or big profiles, sharing in different platforms, and so on. All these White hat methods are effective and help you reach the wider audience. However, not everyone can do this effectively. One needs to know how to create a successful campaign. This gig is all about reaching wider audience and growing the exposure.', 3, 1, 1, 'Influencer Marketing');
+
+
+
+--Writing & Translation
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will write a blog or SEO article up to 600 words', 'I have been working as an article writer on Fiverr for the past 8 years. Along with that experience, I can offer the best article writing and blog post writing services to you! Here are the reasons on why you should order articles from me! I''m not just limited to article writing, but also to website content writing, press release writing, eBook writing and many more! ', 1, 1, 2, 'Articles & Blog Posts');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will translate english to dutch and vice versa very fast', 'You want a fast, flawless and professional translation? Look no further. I have spent years translating SEO content, blog articles and a wide variety of other texts.', 3, 1, 2, 'Translation');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will be your fast english proofreader and editor', 'As a native English proofreader, and ex-business newspaper editor, proofreading and editing flow through my blood, and it all helps me polish your document fast so that it shines for you', 2, 1, 2, 'Proofreading & Editing');
+
+
+
+--Video & Animation
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will create animated explainer video or marketing video for sales', 'You Want High quality 2d Animation, Animated Explainer , sale Video or Marketing Videos to enhance your business/product or service''s growth remarkably ?? Don''t worry at all, you are at the right place. I am here for you :)', 7, 1, 3, 'Video Ads');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will create professional music video for your song', 'To turn your song / track into an amazing and professional visual music video. I will create a music video that will tell the story of your song in the most amazing way ever. I can perfectly match the beat of your song.', 3, 1, 3, 'Lyric & Music Videos');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will create subtitles in spanish or in english to your video', 'Hi! I can subtitle your videos from English to Spanish and vice versa and deliver a .srt file. Every 4 minutes is one gig. 3 days delivery! I can subtitle music videos, animation, short clips, everything but sexual content.', 3, 1, 3, 'Subtitles & Captions');
+
+
+
+--Music & Audio
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 400000, 'I will produce a great retro themed song for your youtube channel, podcast or game', 'Everyone needs an attention-grabber, a catchy melody that will be remembered by your audience and make you stand out in the ever-growing mess that the internet is. I am here to provide you just that', 8, 1, 4, 'Producers & Composers');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will write, sing, play and record any song you want', 'If you need an INTRO, a SOUNDTRACK or an ENTIRE SONG for your YouTube Video or for someone special you want to surprise, I will do it for you! ', 3, 1, 4, 'Songwriters');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 150000, 'I will provide a professional mix and master within 24hrs', 'Broadcast Ready MP3 File or WAV File! Effects Added (Compression, Reverb, Delay, etc). Mastering (Widening, Limiting, Multiband Compression, etc). Up to 10 Stems! 2 Revisions!', 1, 1, 4, 'Mixing & Mastering');
+
+
+
+--Programming & Tech
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will fix php html css javascript bootstrap or jquery issues', 'I will create eye-catching HTML, CSS, Bootstrap, Javascript, and Jquery responsive page for your business. I will write code in php, laravel or fix php laravel or WordPress issues. I will fix frontend responsiveness or backend code issues', 1, 1, 5, 'Web Programming');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 200000, 'I will make any 2d game', 'I will developer a 2D game of any genre for you on unity 3D, for example match 3, RPG, 2D shooter, 2D runner, turn-based strategy.', 8, 1, 5, 'Game Development');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 1000000, 'I will develop android and ios apps', 'I have been developing android and ios native mobile applications from past 6 years and had over 350+ happy customers exclusively on Fiverr. I do mobile apps along with PHP&MySQL REST Apis and firebase as backend services. I have not only developed mobile apps from scratch but also added extra features or fixed bugs in existing apps', 3, 1, 5, 'Mobile Apps');
+
+
+
+--Business
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 50000, 'I will manage your shopify store or shopify website', 'Product uploaded on your Shopify Store. Inventory Updated on your Shopify Store. Order fulfillment on your Shopify Store. Oberlo imports on your Shopify Store. Product Images editing for your Shopify Store. Title optimization. Product editing / Image editing / description editing. Shopify Store virtual assistant. Manage full Shopify Store ', 3, 1, 6, 'E-Commerce Management');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 250000, 'I will do excel data entry, copy paste, data and email scraping', 'Are you looking for low priced option for your business data entry and want it done professionally? Or do you want Email addresses for your business promotion? If yes, then I am the best option for you. I will do all data entry related jobs for you and will try to deliver it on time with 100% satisfaction.', 3, 1, 6, 'Data Entry');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will be your startup business plan writer, pitch deck, business names and proposal', 'We do not offer templates. Our team works on each business plan from start and prepares a document 100% relevant to the business. We offer 3 documents – Editable word file, professional PDF file (if needed) and automated and editable excel file for financials. Our plans are professionally formatted and ready to be presented to anyone.', 2, 1, 6, 'Business Plans');
+
+
+
+--Lifestyle
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 250000, 'I will coach you at valorant as a radiant and pro at fps games', 'As a professional CSGO player I''ve gotten early access to Valorant and can help you be the best at the beginning of the game. I''ve spent every moment perfecting most of the agents!', 3, 1, 6, 'Gaming');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 100000, 'I will answer 3 psychic questions accurate and precise', 'Please be ready to hear the truth, sometimes even the answer which will not be something you expect, because I can only answer the truth and not what you would sometimes expect.', 2, 1, 6, 'Astrology & Psychics');
+
+INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
+VALUES(1, 350000, 'I will create a professional diet and workout plan for you', 'Every person (male/female) is a unique one. There''s no magical formula, but there is a tailored fitness plan for any person. That''s what I work here: I create Diet, Workout, & Supplement Plans tailored to my consumer''s needs.', 3, 1, 6, 'Health, Nutrition & Fitness');
