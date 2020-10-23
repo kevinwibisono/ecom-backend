@@ -35,18 +35,18 @@ router.get("/list/:id_user",async function(req, res){
 
 router.post("/add",async function(req, res){
   //menambahkan gigs ke dalam daftar favorit
-  var gigs = req.body.gigs;
-  var user = req.body.user;
-  var query = `INSERT INTO favorit VALUES(${gigs},${user})`;
+  let gigs = req.body.gigs;
+  let user = req.body.user;
+  let query = `INSERT INTO favorit VALUES(${gigs},${user})`;
   await db.executeQuery(query);
   res.send("Berhasil memfavorit kan gigs!");
 });
 
 router.delete("/delete/:id_gigs/:id_user",async function(req, res){
   //hapus item dari favorit
-  var id = req.params.id_gigs;
-  var user = req.params.id_user;
-  var query = `DELETE FROM favorit WHERE id_gigs = ${id} AND id_user = ${user}`;
+  let id = req.params.id_gigs;
+  let user = req.params.id_user;
+  let query = `DELETE FROM favorit WHERE id_gigs = ${id} AND id_user = ${user}`;
   await db.executeQuery(query);
   res.send("Berhasil unfavorite gigs!");
 });

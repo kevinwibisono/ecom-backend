@@ -51,7 +51,7 @@ CREATE TABLE reviews(
 CREATE TABLE request(
   id_req serial PRIMARY KEY NOT NULL,
   isi_req text NOT NULL,
-  skillset text NOT NULL,
+  category integer NOT NULL,
   batas_waktu date NOT NULL,
   duration integer NOT NULL,
   budget integer NOT NULL,

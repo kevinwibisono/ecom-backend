@@ -5,10 +5,10 @@ const db = require('../db_helper');
 router.post("/search", async function(req, res){
     //search gigs tertentu
     //bisa menyertakan params seperti query, filter & sort type
-    var nama = req.body.nama;
-    var category = req.body.category;
+    let nama = req.body.nama;
+    let category = req.body.category;
     console.log(category);
-    var query = "SELECT * FROM gigs";
+    let query = "SELECT * FROM gigs";
     if(nama != "" && nama != undefined){
       query = query + ` WHERE LOWER(judul) ILIKE '%${nama}%'`;
     }
@@ -17,11 +17,11 @@ router.post("/search", async function(req, res){
       else query = query + ` WHERE category = ${category}`;
     }
     console.log(query);
-    var hasil = await db.executeQuery(query);
+    let hasil = await db.executeQuery(query);
     if(hasil.length > 0){
       for (let index = 0; index < hasil.length; index++) {
         query = `SELECT g.id_gigs, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user group by g.id_gigs, u.id_user, u.nama;`;
-        var searched_gig = await db.executeQuery(query);
+        let searched_gig = await db.executeQuery(query);
         hasil[index].nama_user = searched_gig[0].nama;
         hasil[index].rating = searched_gig[0].rating;
         hasil[index].reviews = searched_gig[0].reviews;
@@ -34,37 +34,37 @@ router.get("/detail/:id", async function(req, res){
   //mendapatkan detail gigs dengan id tertentu
   //termasuk mendapatkan review, penyedia jasa & faq dengan id gigs tersebut
   //hasil res.send akan mengembalikan object gigs dimana dalamnya terdapat array of reviews + array of faq
-  var id_gigs = req.params.id;
-  var hasil = await db.executeQuery("SELECT * FROM gigs WHERE id_gigs = "+id_gigs);
+  let id_gigs = req.params.id;
+  let hasil = await db.executeQuery("SELECT * FROM gigs WHERE id_gigs = "+id_gigs);
   res.status(200).send(hasil[0]);
 });
 
 router.get("/list/:id_user", async function(req, res){
   //mendapatkan daftar gigs milik user tertentu
-  var id = req.params.id_user;
-  var query = `SELECT * FROM gigs WHERE id_user = ${id}`;
-  var hasil = await db.executeQuery(query);
+  let id = req.params.id_user;
+  let query = `SELECT * FROM gigs WHERE id_user = ${id}`;
+  let hasil = await db.executeQuery(query);
   res.send(hasil);
 });
 
 router.post("/add", async function(req, res){
   //menambahkan gigs baru
   //termasuk menambahkan faq
-  var user = req.body.user;
-  var harga = req.body.harga;
-  var desc = req.body.deskripsi;
-  var duration = req.body.duration;
-  var category = req.body.category;
-  var sub_category = req.body.sub_category;
-  var judul = req.body.judul_gigs;
-  var query = "";
+  let user = req.body.user;
+  let harga = req.body.harga;
+  let desc = req.body.deskripsi;
+  let duration = req.body.duration;
+  let category = req.body.category;
+  let sub_category = req.body.sub_category;
+  let judul = req.body.judul_gigs;
+  let query = "";
   if(desc != ""){
     query = `INSERT INTO gigs VALUES(0,${user},${harga},'${desc}',${duration},1,'${category}','${sub_category}','${judul}'))`;
   }
   else{
     query = `INSERT INTO gigs VALUES(0,${user},${harga},'',${duration},1,'${category}','${sub_category}','${judul}')`;
   }
-  var hasil = await db.executeQuery(query);
+  let hasil = await db.executeQuery(query);
   if(hasil){
     res.send("Gigs Added Successfully");
   }
@@ -74,10 +74,10 @@ router.post("/add", async function(req, res){
 });
 
 router.post("/addfaq", async function(req, res){
-  var id_gigs = req.body.id_gigs;
-  var question = req.body.question;
-  var answer = req.body.answer;
-  var hasil = await db.executeQuery(`INSERT INTO faq VALUES(0,${id_gigs},'${question}','${answer}')`);
+  let id_gigs = req.body.id_gigs;
+  let question = req.body.question;
+  let answer = req.body.answer;
+  let hasil = await db.executeQuery(`INSERT INTO faq VALUES(0,${id_gigs},'${question}','${answer}')`);
   if(hasil){
     res.send("FAQ Added Successfully");
   }
@@ -88,17 +88,17 @@ router.post("/addfaq", async function(req, res){
 
 router.put("/update/:id_gigs", async function(req, res){
   //update gigs dengan data-data baru
-  var id = req.params.id_gigs;
-  var harga = req.body.harga;
-  var desc = req.body.deskripsi;
-  var duration = req.body.duration;
-  var category = req.body.category;
-  var sub_category = req.body.sub_category;
-  var user = req.body.user;
-  var qry = `SELECT id_user FROM gigs WHERE id_gigs = ${id}`;
-  var id_user = await db.executeQuery(qry);
+  let id = req.params.id_gigs;
+  let harga = req.body.harga;
+  let desc = req.body.deskripsi;
+  let duration = req.body.duration;
+  let category = req.body.category;
+  let sub_category = req.body.sub_category;
+  let user = req.body.user;
+  let qry = `SELECT id_user FROM gigs WHERE id_gigs = ${id}`;
+  let id_user = await db.executeQuery(qry);
   if(id_user[0] == user){
-    var query = "UPDATE gigs SET ";
+    let query = "UPDATE gigs SET ";
     if(harga != ""){
       query = query + `harga = ${harga}`;
     }
@@ -119,7 +119,7 @@ router.put("/update/:id_gigs", async function(req, res){
       else query = query + `sub_category = '${sub_category}'`;
     }
     query = query + ` WHERE id_gigs = ${id}`;
-    var hasil = await db.executeQuery(query);
+    let hasil = await db.executeQuery(query);
     if(hasil){
       res.send("Berhasil update gigs");
     }
@@ -135,8 +135,8 @@ router.put("/update/:id_gigs", async function(req, res){
 
 router.delete("/delete/:id_gigs",async function(req, res){
   //delete suatu gigs
-  var id = req.params.id_gigs;
-  var query = `DELETE FROM gigs_picture WHERE id_gigs = ${id}`;
+  let id = req.params.id_gigs;
+  let query = `DELETE FROM gigs_picture WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
   query = `DELETE FROM faq WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
@@ -150,7 +150,7 @@ router.delete("/delete/:id_gigs",async function(req, res){
 });
 
 router.get("/subcategories", async function(req, res){
-  var result = await db.executeQuery(`SELECT sub_category FROM subcategories WHERE category = '${req.body.category}'`);
+  let result = await db.executeQuery(`SELECT sub_category FROM subcategories WHERE category = '${req.body.category}'`);
   res.status(200).send(result);
 });
 
