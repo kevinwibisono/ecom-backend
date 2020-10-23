@@ -11,10 +11,12 @@ router.get("/list/:id_user", async function(req, res){
 });
 
 router.post("/add",async function(req, res){
+    // console.log(req.body);
     //post data-data untuk request baru
     let isi = req.body.isi;
     let category = req.body.category;
-    let batas = req.body.batas_waktu;
+    let tgl = new Date(req.body.batas_waktu).getDate() + "/" + new Date(req.body.batas_waktu).getMonth() + "/" + new Date(req.body.batas_waktu).getFullYear();
+    let batas = tgl;
     let duration = req.body.duration;
     let budget = req.body.budget;
     let id_user = req.body.id_user;
