@@ -11,7 +11,7 @@ function getDate(){
 router.get("/", async function(req, res){
   let result = {};
   result.status = 401;
-  let email = req.body.email || '';
+  let email = req.query.email || '';
   try {
     if(email != '') 
     {
@@ -20,6 +20,8 @@ router.get("/", async function(req, res){
       {
         result.status = 200;
         result.data = getUser;
+        // console.log(getUser);
+        result.data[0].skillset = getUser[0].skillset.split('|');
       }
       else
       {
@@ -86,34 +88,31 @@ router.put("/update/personal",[
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     result.status = 400;
-    result.error = res.json({ errors: errors.array() });
+    result.errors = errors.array();
   }
   else
   {
     let email = req.body.email;
     let no_hp = req.body.no_hp;
     let nama = req.body.nama;
-    let bio = req.body.bio;
     let negara = req.body.negara;
     let alamat = req.body.alamat;
     try {
         let getUser = await db.getUser(email);
         if(getUser.length > 0)
         {
-          await db.updatePersonalData(email, no_hp, nama, bio, negara, alamat);
+          await db.updatePersonalData(email, no_hp, nama, negara, alamat);
           result.status = 200;
           result.msg = "Data user berhasil diubah!";
         }
         else
         {
-          result.error = res.json({
-            errors: [{
-              "value": email,
-              "msg": "email tidak terdaftar!",
-              "param": "email",
-              "location": "body"
-            }]
-           });
+          result.errors = [{
+            "value": email,
+            "msg": "email tidak terdaftar!",
+            "param": "email",
+            "location": "body"
+          }];
         }
     } catch (error) {
       console.log(error);
@@ -132,7 +131,7 @@ router.put("/update/partial",[ //utk update bio, education, skillset
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     result.status = 400;
-    result.error = res.json({ errors: errors.array() });
+    result.errors = errors.array();
   }
   else
   {
@@ -149,14 +148,12 @@ router.put("/update/partial",[ //utk update bio, education, skillset
         }
         else
         {
-          result.error = res.json({
-            errors: [{
+          result.errors = [{
               "value": email,
               "msg": "email tidak terdaftar!",
               "param": "email",
               "location": "body"
-            }]
-           });
+            }];
         }
     } catch (error) {
       console.log(error);
