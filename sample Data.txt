@@ -57,12 +57,12 @@ INSERT INTO subcategories VALUES ('Career Counseling', 6);
 INSERT INTO subcategories VALUES ('Business Plans', 6);
 INSERT INTO subcategories VALUES ('Other', 6);
 
-INSERT INTO subcategories VALUES ('Gaming', 6);
-INSERT INTO subcategories VALUES ('Astrology & Psychics', 6);
-INSERT INTO subcategories VALUES ('Health, Nutrition & Fitness', 6);
-INSERT INTO subcategories VALUES ('Travelling', 6);
-INSERT INTO subcategories VALUES ('Relationship Advise', 6);
-INSERT INTO subcategories VALUES ('Other', 6);
+INSERT INTO subcategories VALUES ('Gaming', 7);
+INSERT INTO subcategories VALUES ('Astrology & Psychics', 7);
+INSERT INTO subcategories VALUES ('Health, Nutrition & Fitness', 7);
+INSERT INTO subcategories VALUES ('Travelling', 7);
+INSERT INTO subcategories VALUES ('Relationship Advise', 7);
+INSERT INTO subcategories VALUES ('Other', 7);
 
 --GIGS
 
@@ -153,10 +153,10 @@ VALUES(1, 100000, 'I will be your startup business plan writer, pitch deck, busi
 --Lifestyle
 
 INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
-VALUES(1, 250000, 'I will coach you at valorant as a radiant and pro at fps games', 'As a professional CSGO player I''ve gotten early access to Valorant and can help you be the best at the beginning of the game. I''ve spent every moment perfecting most of the agents!', 3, 1, 6, 'Gaming');
+VALUES(1, 250000, 'I will coach you at valorant as a radiant and pro at fps games', 'As a professional CSGO player I''ve gotten early access to Valorant and can help you be the best at the beginning of the game. I''ve spent every moment perfecting most of the agents!', 3, 1, 7, 'Gaming');
 
 INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
-VALUES(1, 100000, 'I will answer 3 psychic questions accurate and precise', 'Please be ready to hear the truth, sometimes even the answer which will not be something you expect, because I can only answer the truth and not what you would sometimes expect.', 2, 1, 6, 'Astrology & Psychics');
+VALUES(1, 100000, 'I will answer 3 psychic questions accurate and precise', 'Please be ready to hear the truth, sometimes even the answer which will not be something you expect, because I can only answer the truth and not what you would sometimes expect.', 2, 1, 7, 'Astrology & Psychics');
 
 INSERT INTO gigs (id_user, harga, judul, description, duration, gigs_status, category, sub_category)
-VALUES(1, 350000, 'I will create a professional diet and workout plan for you', 'Every person (male/female) is a unique one. There''s no magical formula, but there is a tailored fitness plan for any person. That''s what I work here: I create Diet, Workout, & Supplement Plans tailored to my consumer''s needs.', 3, 1, 6, 'Health, Nutrition & Fitness');
+VALUES(1, 350000, 'I will create a professional diet and workout plan for you', 'Every person (male/female) is a unique one. There''s no magical formula, but there is a tailored fitness plan for any person. That''s what I work here: I create Diet, Workout, & Supplement Plans tailored to my consumer''s needs.', 3, 1, 7, 'Health, Nutrition & Fitness');
