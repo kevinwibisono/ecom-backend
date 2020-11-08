@@ -48,7 +48,7 @@ router.post("/register", async function(req, res){
   let alamat = req.body.alamat;
   let negara = req.body.negara;
   if(email == '' || password == '' || no_hp == '' || nama == '' || alamat == '' || negara == ''){
-    res.status(400).send('Field-field tidak boleh kosong');
+    res.status(400).send('Fields Cannot Be Empty');
   }
   else{
     let emailSearch = await db.executeQuery(`SELECT * FROM user_table WHERE email = '${email}'`);
@@ -69,11 +69,27 @@ router.post("/login", async function(req, res){
     let password = req.body.password;
     let hasil = await db.executeQuery(`SELECT * FROM user_table WHERE email = '${email}' AND password = '${password}'`);
     if(hasil.length <= 0){
-      res.status(401).send("User tidak ditemukan!");
+      res.status(401).send("User Not Found!");
     }
     else{
       res.status(201).send(hasil[0]);
     }
+});
+
+router.put("/beSeller", async function(req, res){
+  //post email & password, cek login
+  let id = req.body.id_user;
+  let bio = req.body.bio;
+  let skillset = req.body.skillset;
+  let education = req.body.education;
+  if(bio == '' || skillset == '' || education == ''){
+    res.status(400).send('You Must At Least Includes Description, 1 Skill and 1 Education');
+  }
+  else{
+    await db.executeQuery(`UPDATE user_table SET bio = '${bio}', skillset = '${skillset}', education = '${education}' WHERE id_user = ${id}`);
+    let user = await db.executeQuery(`SELECT * FROM user_table WHERE id_user = ${id}`);
+    res.status(201).send(user[0]);
+  }
 });
 
 router.put("/update/personal",[
@@ -149,11 +165,11 @@ router.put("/update/partial",[ //utk update bio, education, skillset
         else
         {
           result.errors = [{
-              "value": email,
-              "msg": "email tidak terdaftar!",
-              "param": "email",
-              "location": "body"
-            }];
+            "value": email,
+            "msg": "email tidak terdaftar!",
+            "param": "email",
+            "location": "body"
+          }];
         }
     } catch (error) {
       console.log(error);
