@@ -9,6 +9,7 @@ const revisi = require("./routes/revisi");
 const chat = require("./routes/chat");
 const favorit = require("./routes/favorit");
 const app = express();
+app.use(express.static('./uploads'))
 
 app.use(cors());
 app.use(express.json());
