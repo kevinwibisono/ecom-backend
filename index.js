@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 require('dotenv').config();
 const user = require("./routes/user");
 const cors = require("cors");
@@ -20,7 +21,7 @@ app.use("/transaksi", transaksi);
 app.use("/revisi", revisi);
 app.use("/chat", chat);
 app.use("/favorit", favorit);
-
+app.use(express.static(__dirname+'/uploads'));
 app.get("/", function(req, res){
     //masuk halaman login/register
     res.status(200).send("Ini halaman awal");
