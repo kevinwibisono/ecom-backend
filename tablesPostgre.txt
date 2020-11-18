@@ -43,6 +43,12 @@ CREATE TABLE gigs_tier(
   tier_advantage text NOT NULL
 );
 
+CREATE TABLE gigs_extra(
+  id_gigs integer NOT NULL,
+  extra_name integer NOT NULL,
+  extra_price integer NOT NULL
+);
+
 CREATE TABLE faq(
   id_gigs integer NOT NULL,
   question text NOT NULL,

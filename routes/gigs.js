@@ -74,6 +74,8 @@ router.post("/add", async function(req, res){
   let tier_durations = req.body.tier_durations.split('|');
   let tier_revisions = req.body.tier_revisions.split('|');
   let tier_advantages = req.body.tier_advantages.split('|');
+  let extra_names = req.body.extra_names.split('|');
+  let extra_prices = req.body.extra_prices.split('|');
   let questions = req.body.questions.split('|');
   let answers = req.body.answers.split('|');
 
@@ -90,6 +92,12 @@ router.post("/add", async function(req, res){
     for (let index = 0; index < questions.length; index++) {
       await db.executeQuery(`INSERT INTO faq VALUES(${id_gigs[0].max}, '${questions[index]}', '${answers[index]}')`);
     }
+
+    //kemudian INSERT EXTRA
+    for (let index = 0; index < extra_names.length; index++) {
+      await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
+    }
+
     //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
 
     let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
@@ -113,6 +121,8 @@ router.post("/update/:id_gigs", async function(req, res){
   let tier_durations = req.body.tier_durations.split('|');
   let tier_revisions = req.body.tier_revisions.split('|');
   let tier_advantages = req.body.tier_advantages.split('|');
+  let extra_names = req.body.extra_names.split('|');
+  let extra_prices = req.body.extra_prices.split('|');
   let questions = req.body.questions.split('|');
   let answers = req.body.answers.split('|');
 
@@ -128,6 +138,12 @@ router.post("/update/:id_gigs", async function(req, res){
     await db.executeQuery(`DELETE FROM faq WHERE id_gigs = ${req.params.id_gigs}`);
     for (let index = 0; index < questions.length; index++) {
       await db.executeQuery(`INSERT INTO faq VALUES(${req.params.id_gigs}, '${questions[index]}', '${answers[index]}')`);
+    }
+
+    //kemudian RESET EXTRAS
+    await db.executeQuery(`DELETE FROM gigs_extra WHERE id_gigs = ${req.params.id_gigs}`);
+    for (let index = 0; index < extra_names.length; index++) {
+      await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
     }
 
     //reset PICTURE
@@ -157,6 +173,11 @@ router.get('/getPictures/:id', async function(req, res){
   res.status(200).send(response);
 });
 
+router.get('/getExtras/:id', async function(req, res){
+  let response = await db.executeQuery(`SELECT * FROM gigs_extra WHERE id_gigs = ${req.params.id}`);
+  res.status(200).send(response);
+});
+
 router.post('/uploadPictures', async function(req, res){
   //karena satu gigs bisa upload hingga 4 gambar, maka endpoint ini dapat diakses hingga 4x sekaligus
   upload(req, res, async function(err){
@@ -175,66 +196,6 @@ router.post('/uploadPictures', async function(req, res){
     await db.executeQuery(query);
     res.status(200).send("Gig Picture Added Successfully");
   });
-});
-
-router.post("/addfaq", async function(req, res){
-  let id_gigs = req.body.id_gigs;
-  let question = req.body.question;
-  let answer = req.body.answer;
-  let hasil = await db.executeQuery(`INSERT INTO faq VALUES(0,${id_gigs},'${question}','${answer}')`);
-  if(hasil){
-    res.send("FAQ Added Successfully");
-  }
-  else{
-    res.status(401).send("Failed To Add FAQ");
-  }
-});
-
-router.put("/update/:id_gigs", async function(req, res){
-  //update gigs dengan data-data baru
-  let id = req.params.id_gigs;
-  let harga = req.body.harga;
-  let desc = req.body.deskripsi;
-  let duration = req.body.duration;
-  let category = req.body.category;
-  let sub_category = req.body.sub_category;
-  let user = req.body.user;
-  let qry = `SELECT id_user FROM gigs WHERE id_gigs = ${id}`;
-  let id_user = await db.executeQuery(qry);
-  if(id_user[0] == user){
-    let query = "UPDATE gigs SET ";
-    if(harga != ""){
-      query = query + `harga = ${harga}`;
-    }
-    if(desc != ""){
-      if(harga != "") query = query + `, description = '${desc}'`;
-      else query = query + `description = '${desc}'`;
-    }
-    if(duration != ""){
-      if(desc != "") query = query + `, duration = ${duration}`;
-      else query = query + `duration = ${duration}`;
-    }
-    if(category != ""){
-      if(duration != "") query = query + `, category = '${category}'`;
-      else query = query + `category = '${category}'`;
-    }
-    if(sub_category != ""){
-      if(category != "") query = query + `, sub_category = '${sub_category}'`;
-      else query = query + `sub_category = '${sub_category}'`;
-    }
-    query = query + ` WHERE id_gigs = ${id}`;
-    let hasil = await db.executeQuery(query);
-    if(hasil){
-      res.send("Berhasil update gigs");
-    }
-    else{
-      res.status(401).send("Failed To Update Gigs");
-    }
-  }
-  else{
-    res.status(401).send("You Don't Have Privilege To Update This Gig");
-  }
-  
 });
 
 router.delete("/delete/:id_gigs",async function(req, res){
