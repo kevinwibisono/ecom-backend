@@ -45,7 +45,7 @@ CREATE TABLE gigs_tier(
 
 CREATE TABLE gigs_extra(
   id_gigs integer NOT NULL,
-  extra_name integer NOT NULL,
+  extra_name varchar(100) NOT NULL,
   extra_price integer NOT NULL
 );
 

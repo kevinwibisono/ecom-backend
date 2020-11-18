@@ -62,6 +62,7 @@ router.get("/list/:id_user", async function(req, res){
 router.post("/add", async function(req, res){
   //menambahkan gigs baru
   //termasuk menambahkan faq
+  console.log(req.body);
   let user = req.body.user;
   let harga = req.body.harga;
   let desc = req.body.desc;
@@ -95,7 +96,9 @@ router.post("/add", async function(req, res){
 
     //kemudian INSERT EXTRA
     for (let index = 0; index < extra_names.length; index++) {
-      await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
+      if(extra_names[index] != ''){
+        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${id_gigs[0].max}, '${extra_names[index]}', ${extra_prices[index]})`);
+      }
     }
 
     //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
@@ -143,7 +146,9 @@ router.post("/update/:id_gigs", async function(req, res){
     //kemudian RESET EXTRAS
     await db.executeQuery(`DELETE FROM gigs_extra WHERE id_gigs = ${req.params.id_gigs}`);
     for (let index = 0; index < extra_names.length; index++) {
-      await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
+      if(extra_names[index] != ''){
+        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${id_gigs[0].max}, '${extra_names[index]}', ${extra_prices[index]})`);
+      }
     }
 
     //reset PICTURE
