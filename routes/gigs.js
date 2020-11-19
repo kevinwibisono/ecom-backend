@@ -43,7 +43,7 @@ router.get("/detail/:id", async function(req, res){
 router.get("/list/:id_user", async function(req, res){
   //mendapatkan daftar gigs milik user tertentu
   let id = req.params.id_user;
-  let query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, g.seen, g.clicked, count(t.id_transaksi) as orders from gigs_pictures p, gigs g left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = ${id} and p.id_gigs = g.id_gigs and p.number = 1 group by g.id_gigs, g.judul, g.harga, g.seen, g.clicked, p.directory_file;`;;
+  let query = `SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_user = ${id} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`;;
   let hasil = await db.executeQuery(query);
   res.send(hasil);
 });
