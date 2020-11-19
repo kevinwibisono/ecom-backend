@@ -32,7 +32,7 @@ router.post("/search", async function(req, res){
     let hasil = await db.executeQuery(query);
     if(hasil.length > 0){
       for (let index = 0; index < hasil.length; index++) {
-        query = `SELECT g.id_gigs, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user group by g.id_gigs, u.id_user, u.nama;`;
+        query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
         let searched_gig = await db.executeQuery(query);
         hasil[index].nama_user = searched_gig[0].nama;
         hasil[index].rating = searched_gig[0].rating;
@@ -147,7 +147,7 @@ router.post("/update/:id_gigs", async function(req, res){
     await db.executeQuery(`DELETE FROM gigs_extra WHERE id_gigs = ${req.params.id_gigs}`);
     for (let index = 0; index < extra_names.length; index++) {
       if(extra_names[index] != ''){
-        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${id_gigs[0].max}, '${extra_names[index]}', ${extra_prices[index]})`);
+        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
       }
     }
 
