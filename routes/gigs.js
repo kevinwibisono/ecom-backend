@@ -22,10 +22,10 @@ router.post("/search", async function(req, res){
     let category = req.body.category;
     let query = '';
     if(nama != "" && nama != undefined){
-      query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     if(category != "" && category != undefined){
-      query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     let hasil = await db.executeQuery(query);
     res.send(hasil);
