@@ -20,25 +20,14 @@ router.post("/search", async function(req, res){
     //bisa menyertakan params seperti query, filter & sort type
     let nama = req.body.nama;
     let category = req.body.category;
-    console.log(category);
-    let query = "SELECT * FROM gigs";
+    let query = '';
     if(nama != "" && nama != undefined){
-      query = query + ` WHERE LOWER(judul) ILIKE '%${nama}%'`;
+      query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     if(category != "" && category != undefined){
-      if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
-      else query = query + ` WHERE category = ${category}`;
+      query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     let hasil = await db.executeQuery(query);
-    if(hasil.length > 0){
-      for (let index = 0; index < hasil.length; index++) {
-        query = `SELECT g.id_gigs, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
-        let searched_gig = await db.executeQuery(query);
-        hasil[index].nama_user = searched_gig[0].nama;
-        hasil[index].rating = searched_gig[0].rating;
-        hasil[index].reviews = searched_gig[0].reviews;
-      }
-    }
     res.send(hasil);
 });
 
