@@ -43,7 +43,7 @@ router.get("/detail/:id", async function(req, res){
 router.get("/list/:id_user", async function(req, res){
   //mendapatkan daftar gigs milik user tertentu
   let id = req.params.id_user;
-  let query = `SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_user = ${id} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`;;
+  let query = `SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, count(t.id_gigs) as orders from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_user = ${id} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`;
   let hasil = await db.executeQuery(query);
   res.send(hasil);
 });
@@ -51,7 +51,6 @@ router.get("/list/:id_user", async function(req, res){
 router.post("/add", async function(req, res){
   //menambahkan gigs baru
   //termasuk menambahkan faq
-  console.log(req.body);
   let user = req.body.user;
   let harga = req.body.harga;
   let desc = req.body.desc;
@@ -91,9 +90,7 @@ router.post("/add", async function(req, res){
     }
 
     //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
-
-    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
-    res.status(200).send(gig);
+    res.status(200).send("Gig added successfully");
   }
   else{
     res.status(401).send('Failed to add gig');
@@ -143,9 +140,7 @@ router.post("/update/:id_gigs", async function(req, res){
     //reset PICTURE
     await db.executeQuery(`DELETE FROM gigs_pictures WHERE id_gigs = ${req.params.id_gigs}`);
     //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
-
-    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
-    res.status(200).send(gig);
+    res.status(200).send("Gig updated successfully");
   }
   else{
     res.status(401).send('Failed to update gig');
@@ -188,7 +183,13 @@ router.post('/uploadPictures', async function(req, res){
       query = `INSERT INTO gigs_pictures VALUES(${id_gigs}, ${req.body.number}, '${req.body.filename}')`;
     }
     await db.executeQuery(query);
-    res.status(200).send("Gig Picture Added Successfully");
+    if(req.body.number == 1){
+      let response = await db.executeQuery(`SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, count(t.id_gigs) as orders from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_gigs = ${id_gigs} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`);
+      res.status(200).send(response);
+    }
+    else{
+      res.status(200).send("Gig Picture Added Successfully");
+    }
   });
 });
 
