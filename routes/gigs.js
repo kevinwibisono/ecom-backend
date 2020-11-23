@@ -148,7 +148,7 @@ router.post("/update/:id_gigs", async function(req, res){
 });
 
 router.get('/getTiers/:id', async function(req, res){
-  let response = await db.executeQuery(`SELECT * FROM gigs_tier WHERE id_gigs = ${req.params.id}`);
+  let response = await db.executeQuery(`SELECT * FROM gigs_tier WHERE id_gigs = ${req.params.id} ORDER BY tier_number`);
   res.status(200).send(response);
 });
 
