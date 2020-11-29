@@ -22,10 +22,10 @@ router.post("/search", async function(req, res){
     let category = req.body.category;
     let query = '';
     if(nama != "" && nama != undefined){
-      query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     if(category != "" && category != undefined){
-      query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     let hasil = await db.executeQuery(query);
     res.send(hasil);
@@ -36,7 +36,7 @@ router.get("/detail/:id", async function(req, res){
   //termasuk mendapatkan review, penyedia jasa & faq dengan id gigs tersebut
   //hasil res.send akan mengembalikan object gigs dimana dalamnya terdapat array of reviews + array of faq
   let id_gigs = req.params.id;
-  let hasil = await db.executeQuery("SELECT * FROM gigs WHERE id_gigs = "+id_gigs);
+  let hasil = await db.executeQuery("SELECT g.*, u.nama FROM gigs g, user_table u WHERE g.id_user = u.id_user and id_gigs = "+id_gigs);
   res.status(200).send(hasil[0]);
 });
 
@@ -219,5 +219,18 @@ router.get("/subcategories", async function(req, res){
   let result = await db.executeQuery(query);
   res.status(200).send(result);
 });
+
+router.post("/addClick", async function(req, res){
+  let query = `UPDATE gigs SET clicks = clicks + 1 WHERE id_gigs = ${req.body.id_gigs}`;
+  await db.executeQuery(query);
+  res.status(200).send('Clicks Updated');
+});
+
+router.post("/addSeen", async function(req, res){
+  let query = `UPDATE gigs SET seen = seen + 1 WHERE id_gigs = ${req.body.id_gigs}`;
+  await db.executeQuery(query);
+  res.status(200).send('Seen Updated');
+});
+
 
 module.exports = router;
