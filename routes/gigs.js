@@ -1,6 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
+const multer = require('multer');
+let filename = '';
+
+const storage=multer.diskStorage({
+  destination: './uploads/gigs',
+  filename:function(req,file,cb){
+    cb(null,file.originalname);
+  }
+});
+
+const upload=multer({
+  storage: storage
+}).single('photo');
 
 router.post("/search", async function(req, res){
     //search gigs tertentu
@@ -16,7 +29,6 @@ router.post("/search", async function(req, res){
       if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
       else query = query + ` WHERE category = ${category}`;
     }
-    console.log(query);
     let hasil = await db.executeQuery(query);
     if(hasil.length > 0){
       for (let index = 0; index < hasil.length; index++) {
@@ -52,25 +64,117 @@ router.post("/add", async function(req, res){
   //termasuk menambahkan faq
   let user = req.body.user;
   let harga = req.body.harga;
-  let desc = req.body.deskripsi;
+  let desc = req.body.desc;
   let duration = req.body.duration;
   let category = req.body.category;
   let sub_category = req.body.sub_category;
-  let judul = req.body.judul_gigs;
-  let query = "";
-  if(desc != ""){
-    query = `INSERT INTO gigs VALUES(0,${user},${harga},'${desc}',${duration},1,'${category}','${sub_category}','${judul}'))`;
-  }
-  else{
-    query = `INSERT INTO gigs VALUES(0,${user},${harga},'',${duration},1,'${category}','${sub_category}','${judul}')`;
-  }
+  let judul = req.body.judul;
+  let tier_numbers = req.body.tier_numbers.split('|');
+  let tier_prices = req.body.tier_prices.split('|');
+  let tier_durations = req.body.tier_durations.split('|');
+  let tier_revisions = req.body.tier_revisions.split('|');
+  let tier_advantages = req.body.tier_advantages.split('|');
+  let questions = req.body.questions.split('|');
+  let answers = req.body.answers.split('|');
+
+  let query = `INSERT INTO gigs(id_user, harga, judul, description, duration, gigs_status, category, sub_category, clicks, seen) VALUES(${user},${harga},'${judul}','${desc}',${duration},1,'${category}','${sub_category}', 0, 0)`;
   let hasil = await db.executeQuery(query);
   if(hasil){
-    res.send("Gigs Added Successfully");
+    let id_gigs = await db.executeQuery('SELECT max(id_gigs) FROM gigs');
+    //setelah berhasil insert gigs, kemudian INSERT TIERS
+    for (let index = 0; index < 3; index++) {
+      await db.executeQuery(`INSERT INTO gigs_tier VALUES(${id_gigs[0].max}, ${tier_numbers[index]}, ${tier_prices[index]}, ${tier_durations[index]}, ${tier_revisions[index]}, '${tier_advantages[index]}')`);
+    }
+
+    //kemudian INSERT FAQ
+    for (let index = 0; index < questions.length; index++) {
+      await db.executeQuery(`INSERT INTO faq VALUES(${id_gigs[0].max}, '${questions[index]}', '${answers[index]}')`);
+    }
+    //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
+
+    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
+    res.status(200).send(gig);
   }
   else{
-    res.status(401).send("Failed To Add Gigs");
+    res.status(401).send('Failed to add gig');
   }
+});
+
+router.post("/update/:id_gigs", async function(req, res){
+  //menambahkan gigs baru
+  //termasuk menambahkan faq
+  let harga = req.body.harga;
+  let desc = req.body.desc;
+  let duration = req.body.duration;
+  let category = req.body.category;
+  let sub_category = req.body.sub_category;
+  let judul = req.body.judul;
+  let tier_prices = req.body.tier_prices.split('|');
+  let tier_durations = req.body.tier_durations.split('|');
+  let tier_revisions = req.body.tier_revisions.split('|');
+  let tier_advantages = req.body.tier_advantages.split('|');
+  let questions = req.body.questions.split('|');
+  let answers = req.body.answers.split('|');
+
+  let query = `UPDATE gigs SET harga = ${harga}, description = '${desc}', duration = ${duration}, category = ${category}, sub_category = '${sub_category}', judul = '${judul}' WHERE id_gigs = ${req.params.id_gigs}`;
+  let hasil = await db.executeQuery(query);
+  if(hasil){
+    //setelah berhasil update gigs, kemudian UPDATE KETIGA TIERS
+    for (let index = 0; index < 3; index++) {
+      await db.executeQuery(`UPDATE gigs_tier SET tier_price = ${tier_prices[index]}, tier_duration = ${tier_durations[index]}, tier_revision = ${tier_revisions[index]}, tier_advantage = '${tier_advantages[index]}' WHERE id_gigs = ${req.params.id_gigs} and tier_number = ${index}`);
+    }
+
+    //kemudian RESET FAQ
+    await db.executeQuery(`DELETE FROM faq WHERE id_gigs = ${req.params.id_gigs}`);
+    for (let index = 0; index < questions.length; index++) {
+      await db.executeQuery(`INSERT INTO faq VALUES(${req.params.id_gigs}, '${questions[index]}', '${answers[index]}')`);
+    }
+
+    //reset PICTURE
+    await db.executeQuery(`DELETE FROM gigs_pictures WHERE id_gigs = ${req.params.id_gigs}`);
+    //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
+
+    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
+    res.status(200).send(gig);
+  }
+  else{
+    res.status(401).send('Failed to update gig');
+  }
+});
+
+router.get('/getTiers/:id', async function(req, res){
+  let response = await db.executeQuery(`SELECT * FROM gigs_tier WHERE id_gigs = ${req.params.id}`);
+  res.status(200).send(response);
+});
+
+router.get('/getFaq/:id', async function(req, res){
+  let response = await db.executeQuery(`SELECT * FROM faq WHERE id_gigs = ${req.params.id}`);
+  res.status(200).send(response);
+});
+
+router.get('/getPictures/:id', async function(req, res){
+  let response = await db.executeQuery(`SELECT * FROM gigs_pictures WHERE id_gigs = ${req.params.id} ORDER BY number`);
+  res.status(200).send(response);
+});
+
+router.post('/uploadPictures', async function(req, res){
+  //karena satu gigs bisa upload hingga 4 gambar, maka endpoint ini dapat diakses hingga 4x sekaligus
+  upload(req, res, async function(err){
+    let maxID = await db.executeQuery('SELECT max(id_gigs) FROM gigs');
+    let id_gigs = maxID[0].max;
+    if(req.body.id_gigs){
+      id_gigs = req.body.id_gigs;
+    }
+    let query = '';
+    if(req.file){
+      query = `INSERT INTO gigs_pictures VALUES(${id_gigs}, ${req.body.number}, '${req.file.originalname}')`;
+    }
+    if(req.body.filename){
+      query = `INSERT INTO gigs_pictures VALUES(${id_gigs}, ${req.body.number}, '${req.body.filename}')`;
+    }
+    await db.executeQuery(query);
+    res.status(200).send("Gig Picture Added Successfully");
+  });
 });
 
 router.post("/addfaq", async function(req, res){
@@ -136,7 +240,9 @@ router.put("/update/:id_gigs", async function(req, res){
 router.delete("/delete/:id_gigs",async function(req, res){
   //delete suatu gigs
   let id = req.params.id_gigs;
-  let query = `DELETE FROM gigs_picture WHERE id_gigs = ${id}`;
+  let query = `DELETE FROM gigs_pictures WHERE id_gigs = ${id}`;
+  await db.executeQuery(query);
+  query = `DELETE FROM gigs_tier WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
   query = `DELETE FROM faq WHERE id_gigs = ${id}`;
   await db.executeQuery(query);
@@ -149,8 +255,12 @@ router.delete("/delete/:id_gigs",async function(req, res){
   res.send("Gigs Deleted Successfully");
 });
 
-router.get("/subcategories/:category", async function(req, res){
-  let result = await db.executeQuery(`SELECT sub_category FROM subcategories WHERE category = '${req.params.category}'`);
+router.get("/subcategories", async function(req, res){
+  let query = 'SELECT sub_category FROM subcategories';
+  if(req.query.category){
+    query = `SELECT sub_category FROM subcategories WHERE category = '${req.query.category}'`;
+  }
+  let result = await db.executeQuery(query);
   res.status(200).send(result);
 });
 

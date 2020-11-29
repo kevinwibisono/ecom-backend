@@ -29,7 +29,8 @@ router.post("/add", async function(req, res){
     else{
         let query = `INSERT INTO request (isi_req, category, batas_waktu, duration, budget, id_user) VALUES ('${isi}',${category},TO_DATE('${batas}','dd/MM/yyyy'), ${duration}, ${budget}, ${id_user})`;
         await db.executeQuery(query);
-        res.status(200).send("Berhasil tambah request!");
+        let req = await db.executeQuery(`SELECT * FROM request WHERE id_req IN (SELECT max(id_req) FROM request)`);
+        res.status(200).send(req);
     }
 });
 

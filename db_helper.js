@@ -60,7 +60,8 @@ async function checkRoom(id_user1, id_user2) {
   let result = await executeQuery(`select *
   from 
   (select * from chat_room where id_user = '${id_user1}') as part1,
-  (select * from chat_room where id_user = '${id_user2}') as part2`);
+  (select * from chat_room where id_user = '${id_user2}') as part2
+  where part1.id_room = part2.id_room`);
   return result;
 }
 

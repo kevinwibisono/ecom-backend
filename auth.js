@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-function authToken(token) {
+async function authToken(token) {
     let result = {};
     result.status = 401;
     let user = {};
@@ -9,23 +9,33 @@ function authToken(token) {
     }
     else {
         try {
-            user = jwt.verify(token,"proyekSOA");
-            if((new Date().getTime() / 1000) - user.iat > 3600) {
-                result.msg = "Token Expired.";
-            }
-            else {
+            user = jwt.verify(token,"proyekecom");
+            // if((new Date().getTime() / 1000) - user.iat > 3600) {
+            //     result.msg = "Token Expired.";
+            // }
+            // else {
                 result.status = 200;
                 result.user = user;
-            }
+            // }
         } catch (error) {
-            result.status = 400;
+            result.status = 401;
             result.msg = "Invalid Token!";
             result.error = error;
+            result.token = token;
         }
     }
     return result;
 }
+async function createToken(email, id_user, tipe_user, bio) {
+    return jwt.sign({    
+        "email":email,
+        "id_user":id_user,
+        "tipe_user":tipe_user,
+        "bio":bio,
+    },"proyekecom");
+}
 
 module.exports = {
-    "authToken":authToken
+    authToken,
+    createToken
 };

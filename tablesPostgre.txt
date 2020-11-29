@@ -23,16 +23,27 @@ CREATE TABLE gigs(
   duration integer NOT NULL,
   gigs_status integer NOT NULL,
   category integer NOT NULL,
-  sub_category varchar(100) NOT NULL
+  sub_category varchar(100) NOT NULL,
+  clicks integer,
+  seen integer
 );
 
 CREATE TABLE gigs_pictures(
   id_gigs integer NOT NULL,
+  number integer NOT NULL,
   directory_file varchar(100) NOT NULL
 );
 
+CREATE TABLE gigs_tier(
+  id_gigs integer NOT NULL,
+  tier_number integer NOT NULL,
+  tier_price integer NOT NULL,
+  tier_duration integer NOT NULL,
+  tier_revision integer NOT NULL,
+  tier_advantage text NOT NULL
+);
+
 CREATE TABLE faq(
-  id_faq serial PRIMARY KEY NOT NULL,
   id_gigs integer NOT NULL,
   question text NOT NULL,
   answer text NOT NULL

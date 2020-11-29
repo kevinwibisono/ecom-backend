@@ -9,7 +9,9 @@ const transaksi = require("./routes/transaksi");
 const revisi = require("./routes/revisi");
 const chat = require("./routes/chat");
 const favorit = require("./routes/favorit");
+const mailer = require("./routes/mailer");
 const app = express();
+app.use(express.static('./uploads'))
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +23,8 @@ app.use("/transaksi", transaksi);
 app.use("/revisi", revisi);
 app.use("/chat", chat);
 app.use("/favorit", favorit);
+app.use("/mail", mailer);
+
 app.use(express.static(__dirname+'/uploads'));
 app.get("/", function(req, res){
     //masuk halaman login/register
