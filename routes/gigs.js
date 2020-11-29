@@ -20,25 +20,14 @@ router.post("/search", async function(req, res){
     //bisa menyertakan params seperti query, filter & sort type
     let nama = req.body.nama;
     let category = req.body.category;
-    console.log(category);
-    let query = "SELECT * FROM gigs";
+    let query = '';
     if(nama != "" && nama != undefined){
-      query = query + ` WHERE LOWER(judul) ILIKE '%${nama}%'`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     if(category != "" && category != undefined){
-      if(nama != "" && nama != undefined) query = query + ` AND category = ${category}`;
-      else query = query + ` WHERE category = ${category}`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
     }
     let hasil = await db.executeQuery(query);
-    if(hasil.length > 0){
-      for (let index = 0; index < hasil.length; index++) {
-        query = `SELECT g.id_gigs, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user group by g.id_gigs, u.id_user, u.nama;`;
-        let searched_gig = await db.executeQuery(query);
-        hasil[index].nama_user = searched_gig[0].nama;
-        hasil[index].rating = searched_gig[0].rating;
-        hasil[index].reviews = searched_gig[0].reviews;
-      }
-    }
     res.send(hasil);
 });
 
@@ -47,14 +36,14 @@ router.get("/detail/:id", async function(req, res){
   //termasuk mendapatkan review, penyedia jasa & faq dengan id gigs tersebut
   //hasil res.send akan mengembalikan object gigs dimana dalamnya terdapat array of reviews + array of faq
   let id_gigs = req.params.id;
-  let hasil = await db.executeQuery("SELECT * FROM gigs WHERE id_gigs = "+id_gigs);
+  let hasil = await db.executeQuery("SELECT g.*, u.nama FROM gigs g, user_table u WHERE g.id_user = u.id_user and id_gigs = "+id_gigs);
   res.status(200).send(hasil[0]);
 });
 
 router.get("/list/:id_user", async function(req, res){
   //mendapatkan daftar gigs milik user tertentu
   let id = req.params.id_user;
-  let query = `SELECT * FROM gigs WHERE id_user = ${id}`;
+  let query = `SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, count(t.id_gigs) as orders from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_user = ${id} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`;
   let hasil = await db.executeQuery(query);
   res.send(hasil);
 });
@@ -74,6 +63,8 @@ router.post("/add", async function(req, res){
   let tier_durations = req.body.tier_durations.split('|');
   let tier_revisions = req.body.tier_revisions.split('|');
   let tier_advantages = req.body.tier_advantages.split('|');
+  let extra_names = req.body.extra_names.split('|');
+  let extra_prices = req.body.extra_prices.split('|');
   let questions = req.body.questions.split('|');
   let answers = req.body.answers.split('|');
 
@@ -90,10 +81,16 @@ router.post("/add", async function(req, res){
     for (let index = 0; index < questions.length; index++) {
       await db.executeQuery(`INSERT INTO faq VALUES(${id_gigs[0].max}, '${questions[index]}', '${answers[index]}')`);
     }
-    //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
 
-    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
-    res.status(200).send(gig);
+    //kemudian INSERT EXTRA
+    for (let index = 0; index < extra_names.length; index++) {
+      if(extra_names[index] != ''){
+        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${id_gigs[0].max}, '${extra_names[index]}', ${extra_prices[index]})`);
+      }
+    }
+
+    //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
+    res.status(200).send("Gig added successfully");
   }
   else{
     res.status(401).send('Failed to add gig');
@@ -113,6 +110,8 @@ router.post("/update/:id_gigs", async function(req, res){
   let tier_durations = req.body.tier_durations.split('|');
   let tier_revisions = req.body.tier_revisions.split('|');
   let tier_advantages = req.body.tier_advantages.split('|');
+  let extra_names = req.body.extra_names.split('|');
+  let extra_prices = req.body.extra_prices.split('|');
   let questions = req.body.questions.split('|');
   let answers = req.body.answers.split('|');
 
@@ -130,12 +129,18 @@ router.post("/update/:id_gigs", async function(req, res){
       await db.executeQuery(`INSERT INTO faq VALUES(${req.params.id_gigs}, '${questions[index]}', '${answers[index]}')`);
     }
 
+    //kemudian RESET EXTRAS
+    await db.executeQuery(`DELETE FROM gigs_extra WHERE id_gigs = ${req.params.id_gigs}`);
+    for (let index = 0; index < extra_names.length; index++) {
+      if(extra_names[index] != ''){
+        await db.executeQuery(`INSERT INTO gigs_extra VALUES(${req.params.id_gigs}, '${extra_names[index]}', ${extra_prices[index]})`);
+      }
+    }
+
     //reset PICTURE
     await db.executeQuery(`DELETE FROM gigs_pictures WHERE id_gigs = ${req.params.id_gigs}`);
     //upload PICTURE akan menggunakan ENDPOINT LAIN (/uploadPictures)
-
-    let gig = await db.executeQuery('SELECT * FROM gigs WHERE id_gigs IN (SELECT max(id_gigs) FROM gigs)');
-    res.status(200).send(gig);
+    res.status(200).send("Gig updated successfully");
   }
   else{
     res.status(401).send('Failed to update gig');
@@ -143,7 +148,7 @@ router.post("/update/:id_gigs", async function(req, res){
 });
 
 router.get('/getTiers/:id', async function(req, res){
-  let response = await db.executeQuery(`SELECT * FROM gigs_tier WHERE id_gigs = ${req.params.id}`);
+  let response = await db.executeQuery(`SELECT * FROM gigs_tier WHERE id_gigs = ${req.params.id} ORDER BY tier_number`);
   res.status(200).send(response);
 });
 
@@ -154,6 +159,11 @@ router.get('/getFaq/:id', async function(req, res){
 
 router.get('/getPictures/:id', async function(req, res){
   let response = await db.executeQuery(`SELECT * FROM gigs_pictures WHERE id_gigs = ${req.params.id} ORDER BY number`);
+  res.status(200).send(response);
+});
+
+router.get('/getExtras/:id', async function(req, res){
+  let response = await db.executeQuery(`SELECT * FROM gigs_extra WHERE id_gigs = ${req.params.id}`);
   res.status(200).send(response);
 });
 
@@ -173,68 +183,14 @@ router.post('/uploadPictures', async function(req, res){
       query = `INSERT INTO gigs_pictures VALUES(${id_gigs}, ${req.body.number}, '${req.body.filename}')`;
     }
     await db.executeQuery(query);
-    res.status(200).send("Gig Picture Added Successfully");
-  });
-});
-
-router.post("/addfaq", async function(req, res){
-  let id_gigs = req.body.id_gigs;
-  let question = req.body.question;
-  let answer = req.body.answer;
-  let hasil = await db.executeQuery(`INSERT INTO faq VALUES(0,${id_gigs},'${question}','${answer}')`);
-  if(hasil){
-    res.send("FAQ Added Successfully");
-  }
-  else{
-    res.status(401).send("Failed To Add FAQ");
-  }
-});
-
-router.put("/update/:id_gigs", async function(req, res){
-  //update gigs dengan data-data baru
-  let id = req.params.id_gigs;
-  let harga = req.body.harga;
-  let desc = req.body.deskripsi;
-  let duration = req.body.duration;
-  let category = req.body.category;
-  let sub_category = req.body.sub_category;
-  let user = req.body.user;
-  let qry = `SELECT id_user FROM gigs WHERE id_gigs = ${id}`;
-  let id_user = await db.executeQuery(qry);
-  if(id_user[0] == user){
-    let query = "UPDATE gigs SET ";
-    if(harga != ""){
-      query = query + `harga = ${harga}`;
-    }
-    if(desc != ""){
-      if(harga != "") query = query + `, description = '${desc}'`;
-      else query = query + `description = '${desc}'`;
-    }
-    if(duration != ""){
-      if(desc != "") query = query + `, duration = ${duration}`;
-      else query = query + `duration = ${duration}`;
-    }
-    if(category != ""){
-      if(duration != "") query = query + `, category = '${category}'`;
-      else query = query + `category = '${category}'`;
-    }
-    if(sub_category != ""){
-      if(category != "") query = query + `, sub_category = '${sub_category}'`;
-      else query = query + `sub_category = '${sub_category}'`;
-    }
-    query = query + ` WHERE id_gigs = ${id}`;
-    let hasil = await db.executeQuery(query);
-    if(hasil){
-      res.send("Berhasil update gigs");
+    if(req.body.number == 1){
+      let response = await db.executeQuery(`SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, count(t.id_gigs) as orders from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_gigs = ${id_gigs} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`);
+      res.status(200).send(response);
     }
     else{
-      res.status(401).send("Failed To Update Gigs");
+      res.status(200).send("Gig Picture Added Successfully");
     }
-  }
-  else{
-    res.status(401).send("You Don't Have Privilege To Update This Gig");
-  }
-  
+  });
 });
 
 router.delete("/delete/:id_gigs",async function(req, res){
@@ -263,5 +219,18 @@ router.get("/subcategories", async function(req, res){
   let result = await db.executeQuery(query);
   res.status(200).send(result);
 });
+
+router.post("/addClick", async function(req, res){
+  let query = `UPDATE gigs SET clicks = clicks + 1 WHERE id_gigs = ${req.body.id_gigs}`;
+  await db.executeQuery(query);
+  res.status(200).send('Clicks Updated');
+});
+
+router.post("/addSeen", async function(req, res){
+  let query = `UPDATE gigs SET seen = seen + 1 WHERE id_gigs = ${req.body.id_gigs}`;
+  await db.executeQuery(query);
+  res.status(200).send('Seen Updated');
+});
+
 
 module.exports = router;
