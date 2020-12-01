@@ -13,12 +13,10 @@ router.get("/list/:id_user",async function(req, res){
     for (let index = 0; index < hasil.length; index++) {
       let gig = {};
       gig.id_gigs = hasil[index].id_gigs;
-      let query = `SELECT g.judul, g.harga, g.description, g.category, g.sub_category, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user group by g.judul, g.harga, g.description, g.category, g.sub_category, u.nama;`;
+      let query = `SELECT g.judul, g.harga, g.description, g.category, g.sub_category, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, p.directory_file from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_gigs = ${hasil[index].id_gigs} and g.id_user = u.id_user and g.id_gigs = p.id_gigs and p.number = 1 group by g.judul, g.harga, g.description, g.category, g.sub_category, u.nama, p.directory_file;`;
       let searched_gig = await db.executeQuery(query);
-      console.log(searched_gig);
       gig.judul = searched_gig[0].judul;
       gig.harga = searched_gig[0].harga;
-      gig.description = searched_gig[0].description;
       gig.category = searched_gig[0].category;
       gig.sub_category = searched_gig[0].sub_category;
       gig.nama_user = searched_gig[0].nama;
