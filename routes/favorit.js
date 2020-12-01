@@ -22,6 +22,7 @@ router.get("/list/:id_user",async function(req, res){
       gig.nama_user = searched_gig[0].nama;
       gig.reviews = searched_gig[0].reviews;
       gig.rating = searched_gig[0].rating;
+      gig.directory_file = searched_gig[0].directory_file;
       gigs.push(gig);
     }
     res.send(gigs);
