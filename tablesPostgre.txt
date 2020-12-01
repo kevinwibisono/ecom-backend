@@ -81,12 +81,30 @@ CREATE TABLE transaksi(
   id_buyer integer NOT NULL,
   id_gigs integer NOT NULL,
   tier_number integer NOT NULL,
+  gigs_quantity integer NOT NULL,
+  website_fee integer NOT NULL,
   extras text NOT NULL,
+  total integer NOT NULL,
   tgl_transaksi date NOT NULL,
-  tgl_selesai date NOT NULL,
-  directory_file varchar(100) NOT NULL,
-  status_transaksi integer NOT NULL,
+  tgl_selesai date,
+  status_transaksi integer NOT NULL
+);
+
+CREATE TABLE transaksi_ipaymu(
+  sessionID varchar PRIMARY KEY NOT NULL,
+  id_seller integer NOT NULL,
+  id_buyer integer NOT NULL,
+  id_gigs integer NOT NULL,
+  tier_number integer NOT NULL,
+  gigs_quantity integer NOT NULL,
+  website_fee integer NOT NULL,
+  extras text NOT NULL,
   total integer NOT NULL
+);
+
+CREATE TABLE transaksi_files(
+  id_transaksi integer NOT NULL,
+  directory_file varchar(100)
 );
 
 CREATE TABLE revisi(
