@@ -104,7 +104,8 @@ CREATE TABLE transaksi_ipaymu(
 
 CREATE TABLE transaksi_files(
   id_transaksi integer NOT NULL,
-  directory_file varchar(100)
+  directory_file varchar(100),
+  id_revisi integer --jika file ini adalah file hasil revisi, maka tidak akan null
 );
 
 CREATE TABLE revisi(

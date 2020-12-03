@@ -15,6 +15,11 @@ const upload=multer({
   storage: storage
 }).single('photo');
 
+router.get("/autocompleteList", async function(req, res){
+  let response = await db.executeQuery("SELECT id_gigs, judul FROM gigs");
+  res.status(200).send(response);
+});
+
 router.post("/search", async function(req, res){
     //search gigs tertentu
     //bisa menyertakan params seperti query, filter & sort type
@@ -212,9 +217,9 @@ router.delete("/delete/:id_gigs",async function(req, res){
 });
 
 router.get("/subcategories", async function(req, res){
-  let query = 'SELECT sub_category FROM subcategories';
+  let query = 'SELECT * FROM subcategories';
   if(req.query.category){
-    query = `SELECT sub_category FROM subcategories WHERE category = '${req.query.category}'`;
+    query = `SELECT * FROM subcategories WHERE category = '${req.query.category}'`;
   }
   let result = await db.executeQuery(query);
   res.status(200).send(result);
