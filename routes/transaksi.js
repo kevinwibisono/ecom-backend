@@ -36,7 +36,7 @@ router.put("/update/:id_transaksi", function(req, res){
 
 router.post("/createIpaymuLink", async function(req, res){
     //begitu buyer melewati tahap pembayaran, maka tambahkan transaksi ke database
-    let formDataString = `{"key":"9A6FC584-43C3-45C7-891E-CB8A2E197362","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"expired":"24","format":"json","ureturn":"${req.body.ureturn}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
+    let formDataString = `{"key":"9A6FC584-43C3-45C7-891E-CB8A2E197362","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"auto_redirect":"100000","expired":"24","format":"json","ureturn":"${req.body.ureturn}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
     let link = await generateIpaymuLink(JSON.parse(formDataString));
     res.status(200).send(link);
 });
