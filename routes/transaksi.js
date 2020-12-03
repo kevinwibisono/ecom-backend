@@ -58,12 +58,12 @@ router.post("/addIpaymu", async function(req, res){
 });
 
 router.post("/afterIpaymu", async function(req, res){
-    let response = await db.executeQuery(`SELECT * FROM transaksi_ipaymu WHERE sessionID = '${req.query.sid}'`);
+    let response = await db.executeQuery(`SELECT * FROM transaksi_ipaymu WHERE sessionID = '${req.body.sid}'`);
     let today = new Date();
     let tgl_transaksi = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
     await db.executeQuery(`INSERT INTO transaksi(id_seller, id_buyer, id_gigs, tier_number, gigs_quantity, website_fee, extras, total, tgl_transaksi, status_transaksi) VALUES(${response[0].id_seller}, ${response[0].id_buyer}, ${response[0].id_gigs}, ${response[0].tier_number}, ${response[0].gigs_quantity}, ${response[0].website_fee}, '${response[0].extras}', ${response[0].total}, '${tgl_transaksi}', 1)`);
-    await db.executeQuery(`DELETE FROM transaksi_ipaymu WHERE sessionID = '${req.query.sid}'`);
-    res.send(req.query.status);
+    await db.executeQuery(`DELETE FROM transaksi_ipaymu WHERE sessionID = '${req.body.sid}'`);
+    res.send(req.body.status);
 });
 
 module.exports = router;
