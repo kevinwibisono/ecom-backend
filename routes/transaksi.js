@@ -57,7 +57,7 @@ router.post("/addIpaymu", async function(req, res){
     res.status(200).send("Berhasil menambahkan ipaymu transaction");
 });
 
-router.post("/afterIpaymu", function(req, res){
+router.post("/afterIpaymu", async function(req, res){
     let response = await db.executeQuery(`SELECT * FROM transaksi_ipaymu WHERE sessionID = '${req.query.sid}'`);
     let today = new Date();
     let tgl_transaksi = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
