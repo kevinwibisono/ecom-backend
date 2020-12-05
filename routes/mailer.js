@@ -26,7 +26,7 @@ router.post("/send", async function(req, res){
       });
       
       let mailOptions = {
-          from: 'johananpoerwanto@gmail.com',
+          from: 'proyekecom.korian@gmail.com',
           to: `${email}`,
           subject: 'Verifikasi Email Anda',
           text: 'it works',
