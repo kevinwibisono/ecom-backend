@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
+const multer = require('multer');
+let filename = '';
 
 function generateIpaymuLink(dataForm){
     return new Promise(function(resolve, reject){
@@ -20,18 +22,64 @@ function generateIpaymuLink(dataForm){
     });
 }
 
-router.get("/list/:id_user", function(req, res){
+const storage=multer.diskStorage({
+  destination: './uploads/orders',
+  filename:function(req,file,cb){
+    cb(null,file.originalname);
+  }
+});
+
+const upload=multer({
+  storage: storage
+}).single('file');
+
+router.get("/list/:id_user/:type", async function(req, res){
     //dapatkan list transaksi dimana user terlibat
-    
+    let query = "";
+    if(req.params.type == 1){
+        //lihat sebagai buyer
+        query = `SELECT t.id_transaksi, t.website_fee, t.id_gigs, t.status_transaksi, t.tier_number, t.gigs_quantity, t.extras, t.total, u.nama as seller_name, to_char(t.tgl_transaksi, 'DD Mon YYYY') as tgl_transaksi, to_char(t.tgl_accept, 'DD Mon YYYY') as tgl_accept, to_char(t.tgl_target, 'DD Mon YYYY') as tgl_target, to_char(t.tgl_selesai, 'DD Mon YYYY') as tgl_selesai, g.judul, p.directory_file as gambar_gig FROM transaksi t, gigs g, user_table u, gigs_pictures p WHERE t.id_gigs = g.id_gigs and t.id_seller = u.id_user and t.id_gigs = p.id_gigs and p.number = 1 and id_buyer = ${req.params.id_user}`;
+    }
+    else if(req.params.type == 2){
+        //lihat sebagai seller
+        query = `SELECT t.id_transaksi, t.website_fee, t.id_gigs, t.status_transaksi, t.tier_number, t.gigs_quantity, t.extras, t.total, u.nama as buyer_name, to_char(t.tgl_transaksi, 'DD Mon YYYY') as tgl_transaksi, to_char(t.tgl_accept, 'DD Mon YYYY') as tgl_accept, to_char(t.tgl_target, 'DD Mon YYYY') as tgl_target, to_char(t.tgl_selesai, 'DD Mon YYYY') as tgl_selesai, g.judul, p.directory_file as gambar_gig FROM transaksi t, gigs g, user_table u, gigs_pictures p WHERE t.id_gigs = g.id_gigs and t.id_buyer = u.id_user and t.id_gigs = p.id_gigs and p.number = 1 and id_seller = ${req.params.id_user}`;
+    }
+    let listorder = await db.executeQuery(query);
+    res.status(200).send(listorder);
+});
+
+router.get("/listRevision/:id_transaksi", async function(req, res){
+    //dapatkan list transaksi dimana user terlibat
+    let query = `SELECT * FROM revisi WHERE id_transaksi = ${req.params.id_transaksi}`;
+    let listrevisi = await db.executeQuery(query);
+    res.status(200).send(listrevisi);
 });
 
 router.post("/add", function(req, res){
     //begitu buyer melewati tahap pembayaran, maka tambahkan transaksi ke database
 });
 
-router.put("/update/:id_transaksi", function(req, res){
-    //update status transaksi yang dilakukan oleh seller dan buyer (konfirmasi selesai)
-    
+router.put("/acceptOrder/:id_transaksi", async function(req, res){
+    //update status transaksi menjadi Needs To Be Delivered (2)
+    //tentukan tgl accept dan tanggal target penyelesaian
+    let tier_detail = await db.executeQuery(`SELECT g.* FROM gigs_tier g, transaksi t WHERE  g.id_gigs = t.id_gigs and g.tier_number = t.tier_number and t.id_transaksi = ${req.params.id_transaksi}`);
+    let today = new Date();
+    let tgl_accept = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+    today.setDate(today.getDate() + tier_detail[0].tier_duration);
+    let tgl_target = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+    await db.executeQuery(`UPDATE transaksi SET status_transaksi = 2, tgl_accept = '${tgl_accept}', tgl_target = '${tgl_target}' WHERE id_transaksi = ${req.params.id_transaksi}`);
+    let tgl = await db.executeQuery("SELECT to_char(tgl_accept, 'DD Mon YYYY') as tgl_accept, to_char(tgl_target, 'DD Mon YYYY') as tgl_target FROM transaksi WHERE id_transaksi = "+req.params.id_transaksi);
+    res.status(200).send({tgl_accept:tgl[0].tgl_accept, tgl_target:tgl[0].tgl_target});
+});
+
+router.put("/deliverOrder/:id_transaksi", async function(req, res){
+    //upload hasil kerja
+    upload(req, res, async function(err){
+        let today = new Date();
+        let tgl_deliver = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+        await db.executeQuery(`UPDATE transaksi SET status_transaksi = 3, tgl_deliver = '${tgl_deliver}', directory_file = '${filename}' WHERE id_transaksi = ${req.params.id_transaksi}`);
+        res.status(200).send("Berhasil update status transaksi");  
+    });
 });
 
 router.post("/createIpaymuLink", async function(req, res){

@@ -119,7 +119,8 @@ router.post("/register", async function(req, res){
     if(emailSearch.length <= 0){
       await db.executeQuery(`INSERT INTO user_table (email,no_hp,nama,password,tipe_user,alamat,negara,created_at) VALUES ('${email}','${no_hp}','${nama}','${password}','1','${alamat}','${negara}',TO_DATE('${getDate()}','dd/MM/yyyy'))`);
       let user = await db.executeQuery(`SELECT * FROM user_table WHERE email = '${email}'`);
-      let token = JWT.createToken(email, user[0].id_user, user[0].tipe_user, user[0].bio);
+      let token = await JWT.createToken(email, user[0].id_user, user[0].tipe_user, user[0].bio);
+      console.log(token);
       res.status(200).send(token);
     }
     else{

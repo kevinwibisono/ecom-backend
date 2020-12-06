@@ -27,10 +27,10 @@ router.post("/search", async function(req, res){
     let category = req.body.category;
     let query = '';
     if(nama != "" && nama != undefined){
-      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and LOWER(g.judul) ILIKE '%${nama}%' group by g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama;`;
     }
     if(category != "" && category != undefined){
-      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, u.id_user, u.nama, p.directory_file;`;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.category = ${category} group by g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama;`;
     }
     let hasil = await db.executeQuery(query);
     res.send(hasil);
@@ -228,6 +228,8 @@ router.get("/subcategories", async function(req, res){
 router.post("/addClick", async function(req, res){
   let query = `UPDATE gigs SET clicks = clicks + 1 WHERE id_gigs = ${req.body.id_gigs}`;
   await db.executeQuery(query);
+  query = `INSERT INTO history_gigs(id_user, id_gigs) VALUES(${req.body.id_user}, ${req.body.id_gigs})`;
+  await db.executeQuery(query);
   res.status(200).send('Clicks Updated');
 });
 
@@ -235,6 +237,48 @@ router.post("/addSeen", async function(req, res){
   let query = `UPDATE gigs SET seen = seen + 1 WHERE id_gigs = ${req.body.id_gigs}`;
   await db.executeQuery(query);
   res.status(200).send('Seen Updated');
+});
+
+router.get("/getRecommendation", async function(req, res){
+  let toBeReturned = [];
+  if(req.query.id_user){
+    let query = `SELECT h.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from history_gigs h, gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and h.id_gigs = g.id_gigs and h.id_user = ${req.query.id_user} group by h.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY h.id_gigs desc LIMIT 12;`;
+    let response = await db.executeQuery(query);
+    toBeReturned = response;
+    if(response.length < 12){
+      //jika tidak sampai 12, cari pengisinya
+      let limit = 12 - response.length;
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY g.id_gigs desc LIMIT ${limit};`;
+      response = await db.executeQuery(query);
+      response.forEach(element => {
+        toBeReturned.push(element);
+      });
+    }
+  }
+  else{
+    let query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY g.id_gigs desc LIMIT 12;`;
+    let response = await db.executeQuery(query);
+    toBeReturned = response;
+  }
+  res.status(200).send(toBeReturned);
+});
+
+router.get("/top5Latest", async function(req, res){
+  let query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, p.directory_file ORDER BY g.id_gigs desc LIMIT 5;`;
+  let response = await db.executeQuery(query);
+  res.status(200).send(response);
+});
+
+router.get("/top5Rated", async function(req, res){
+  let query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, p.directory_file ORDER BY avg(r.rating) desc LIMIT 5;`;
+  let response = await db.executeQuery(query);
+  res.status(200).send(response);
+});
+
+router.get("/top5Reviewed", async function(req, res){
+  let query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, p.directory_file ORDER BY count(r.id_review) desc LIMIT 5;`;
+  let response = await db.executeQuery(query);
+  res.status(200).send(response);
 });
 
 

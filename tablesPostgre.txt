@@ -86,8 +86,12 @@ CREATE TABLE transaksi(
   extras text NOT NULL,
   total integer NOT NULL,
   tgl_transaksi date NOT NULL,
+  status_transaksi integer NOT NULL,
+  tgl_accept date,
+  tgl_target date,
+  tgl_deliver date,
   tgl_selesai date,
-  status_transaksi integer NOT NULL
+  directory_file varchar(100)  
 );
 
 CREATE TABLE transaksi_ipaymu(
@@ -102,10 +106,10 @@ CREATE TABLE transaksi_ipaymu(
   total integer NOT NULL
 );
 
-CREATE TABLE transaksi_files(
-  id_transaksi integer NOT NULL,
-  directory_file varchar(100),
-  id_revisi integer --jika file ini adalah file hasil revisi, maka tidak akan null
+CREATE TABLE history_gigs(
+  id_history serial PRIMARY KEY NOT NULL,
+  id_user integer NOT NULL,
+  id_gigs integer NOT NULL
 );
 
 CREATE TABLE revisi(
