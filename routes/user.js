@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
-const { body, validationResult, header } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
@@ -11,8 +11,9 @@ let storage = multer.diskStorage({
   destination:function(req, file, cb){
     cb(null, './uploads/profile');
   },
-  filename: function(req, file, cb){
-      cb(null, req.headers.email + "." + file.originalname.split(".")[1])
+  filename: async function(req, file, cb){
+    let auth = await JWT.authToken(req.headers.token);
+      cb(null,auth.user.email  + "." + file.originalname.split(".")[1])
   }
 });
 
@@ -71,6 +72,20 @@ router.get("/", async function(req, res){
   }
   res.status(result.status).send(result);
 });
+
+router.get("/allUser", async function(req, res){
+  let result = {};
+  result.status = 401;
+  try {
+    result.data = await db.getAllSeller();
+    result.status = 200;
+  } catch (error) {
+    console.log(error);
+    result.msg = error;
+  }
+  res.status(result.status).send(result);
+});
+
 
 router.get("/self", async function(req, res){
   let result = {};
@@ -178,7 +193,7 @@ router.put("/update/personal",[
   let result = {};
   result.status = 401;
   let token = req.header("token");
-  let auth = JWT.authToken(token);
+  let auth = await JWT.authToken(token);
   console.log(auth);
   if(auth.status >= 400) {
       result = auth;
@@ -299,28 +314,24 @@ router.put("/update/v", async function(req, res){ //verify email
   res.status(result.status).send(result);
 });
 
-router.post("/photo",upload.single('foto'), [
-  header('email').not().isEmpty().escape().withMessage('email tidak boleh kosong'),
-], async function(req, res){
+router.post("/photo",upload.single('foto'), async function(req, res){
   let result = {};
   result.status = 401;
-  const errors = validationResult(req);
-  let email = req.headers.email;
-
-
-  if (!errors.isEmpty()) {
-    result.status = 400;
-    result.errors = errors.array();
+  let token = req.header("token");
+  let auth = await JWT.authToken(token);
+  if(auth.status >= 400) {
+      result = auth;
   }
-  else
-  {
+  else {
+    let email = auth.user.email;
     try {
         let getUser = await db.getUser(email);
         if(getUser.length > 0)
         {
-          // await db.updateUserOne(email, param, value);
+          await db.updateUserOne(email, 'photo_dir', req.file.filename);
           result.status = 200;
-          result.msg = `foto user berhasil diupload!`;
+          result.msg = `Foto anda berhasil diupload!`;
+          result.data = req.file.filename;
         }
         else
         {
@@ -338,18 +349,18 @@ router.post("/photo",upload.single('foto'), [
       console.log(error);
       result.msg = error;
     }
-  }
 
-  fs.readdir('./uploads/profile', (err, files) => {
-    if (err) throw err;
-    for (const file of files) {
-      if(file.includes(email) && file != req.file.filename) {
-        fs.unlink(path.join('./uploads/profile', file), err => {
-          if (err) throw err;
-        });
+    fs.readdir('./uploads/profile', (err, files) => {
+      if (err) throw err;
+      for (const file of files) {
+        if(file.includes(email) && file != req.file.filename) {
+          fs.unlink(path.join('./uploads/profile', file), err => {
+            if (err) throw err;
+          });
+        }
       }
-    }
-  });
+    });
+  }
   
   res.status(result.status).send(result);
 });

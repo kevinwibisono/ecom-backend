@@ -21,6 +21,11 @@ async function getUser(email) {
   return result;
 }
 
+async function getAllSeller() {
+  let result = await executeQuery(`SELECT id_user, nama, email from user_table where bio != ''`);
+  return result;
+}
+
 async function updatePersonalData(email, no_hp, nama, negara, alamat) {
   let result = await executeQuery(`UPDATE user_table set 
   no_hp = '${no_hp}', 
@@ -86,5 +91,6 @@ module.exports = {
   postMessage,
   checkRoom,
   createRoom,
-  getChats
+  getChats,
+  getAllSeller
 }
