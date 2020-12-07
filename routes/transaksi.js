@@ -103,7 +103,7 @@ router.put("/finishOrder/:id_transaksi", async function(req, res){
     let today = new Date();
     let tgl_selesai = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
     await db.executeQuery(`UPDATE transaksi SET status_transaksi = 4, tgl_selesai = '${tgl_selesai}' WHERE id_transaksi = ${req.params.id_transaksi}`);
-    res.status(200).send({tgl_selesai:tgl[0].tgl_selesai});
+    res.status(200).send({tgl_selesai:tgl_selesai});
 });
 
 router.post("/createIpaymuLink", async function(req, res){
