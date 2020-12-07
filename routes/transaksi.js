@@ -51,13 +51,26 @@ router.get("/list/:id_user/:type", async function(req, res){
 
 router.get("/listRevision/:id_transaksi", async function(req, res){
     //dapatkan list transaksi dimana user terlibat
-    let query = `SELECT * FROM revisi WHERE id_transaksi = ${req.params.id_transaksi}`;
+    let query = `SELECT * FROM revisi WHERE id_transaksi = ${req.params.id_transaksi} ORDER BY id_revisi`;
     let listrevisi = await db.executeQuery(query);
     res.status(200).send(listrevisi);
 });
 
-router.post("/add", function(req, res){
-    //begitu buyer melewati tahap pembayaran, maka tambahkan transaksi ke database
+router.post("/addRevision/:id_transaksi", async function(req, res){
+    let today = new Date();
+    let tgl_revisi = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+    await db.executeQuery(`INSERT INTO revisi(id_transaksi, tgl_revisi, alasan_revisi) VALUES(${req.params.id_transaksi}, '${tgl_revisi}', '${req.body.alasan}')`);
+    await db.executeQuery(`UPDATE transaksi SET revision_left = revision_left - 1 WHERE id_transaksi = ${req.params.id_transaksi}`);
+    let response = await db.executeQuery('SELECT * FROM revisi WHERE id_revisi IN (SELECT max(id_revisi) FROM revisi)');
+    res.status(200).send(response[0]);
+});
+
+router.post("/handleRevision/:id_revision", async function(req, res){
+    //upload file untuk revisi
+    upload(req, res, async function(err){
+        await db.executeQuery(`UPDATE revisi SET directory_file_revisi = '${filename}' WHERE id_revisi = ${req.params.id_revision}`);
+        res.status(200).send(filename);
+    });
 });
 
 router.put("/acceptOrder/:id_transaksi", async function(req, res){
@@ -82,6 +95,15 @@ router.put("/deliverOrder/:id_transaksi", async function(req, res){
         let tgl = await db.executeQuery("SELECT to_char(tgl_deliver, 'DD Mon YYYY') as tgl_deliver FROM transaksi WHERE id_transaksi = "+req.params.id_transaksi);
         res.status(200).send({tgl_deliver:tgl[0].tgl_deliver, directory_file: filename});
     });
+});
+
+router.put("/finishOrder/:id_transaksi", async function(req, res){
+    //update status transaksi menjadi Needs To Be Delivered (2)
+    //tentukan tgl accept dan tanggal target penyelesaian
+    let today = new Date();
+    let tgl_selesai = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+    await db.executeQuery(`UPDATE transaksi SET status_transaksi = 4, tgl_selesai = '${tgl_selesai}' WHERE id_transaksi = ${req.params.id_transaksi}`);
+    res.status(200).send({tgl_selesai:tgl[0].tgl_selesai});
 });
 
 router.post("/createIpaymuLink", async function(req, res){
