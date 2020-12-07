@@ -80,6 +80,30 @@ async function getChats(id_room) {
   return result;
 }
 
+async function getReviewsByUser(id_user) {
+  let result = await executeQuery(`
+  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at
+  from reviews r, user_table u
+  where r.id_reviewer = u.id_user and r.id_user = ${id_user}`);
+  return result;
+}
+
+async function getReviewsBygig(id_gig) {
+  let result = await executeQuery(`
+  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at
+  from reviews r, user_table u
+  where r.id_reviewer = u.id_user and r.id_gigs = ${id_gig}`);
+  return result;
+}
+
+async function addReview(id_user, id_reviewer, id_gigs, rating, comment) {
+  console.log({id_user, id_reviewer, id_gigs, rating, comment});
+  let result = await executeQuery(`INSERT INTO 
+  reviews(id_user, id_reviewer, id_gigs, rating, comment, created_at) 
+  values('${id_user}', '${id_reviewer}', '${id_gigs}', '${rating}', '${comment}', now())`);
+  return result;
+}
+
 client.connect();
 
 module.exports = {
@@ -92,5 +116,8 @@ module.exports = {
   checkRoom,
   createRoom,
   getChats,
-  getAllSeller
+  getAllSeller,
+  addReview,
+  getReviewsByUser,
+  getReviewsBygig
 }

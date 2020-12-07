@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
 const multer = require('multer');
+const { body, validationResult } = require('express-validator');
+const JWT = require('./../auth');
 let filename = '';
 
 const storage=multer.diskStorage({
@@ -47,6 +49,7 @@ router.get("/detail/:id", async function(req, res){
 
 router.get("/list/:id_user", async function(req, res){
   //mendapatkan daftar gigs milik user tertentu
+  console.log("mashook");
   let id = req.params.id_user;
   let query = `SELECT g.id_gigs, g.judul, g.harga, g.clicks, g.seen, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating, count(t.id_gigs) as orders from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) left join transaksi t on (t.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and g.id_user = ${id} group by g.id_gigs, u.id_user, u.nama, p.directory_file, g.clicks, g.seen;`;
   let hasil = await db.executeQuery(query);
@@ -235,6 +238,81 @@ router.post("/addSeen", async function(req, res){
   let query = `UPDATE gigs SET seen = seen + 1 WHERE id_gigs = ${req.body.id_gigs}`;
   await db.executeQuery(query);
   res.status(200).send('Seen Updated');
+});
+
+router.get("/review", async function(req, res){
+  let result = {};
+  result.status = 401;
+
+  try {
+    let getUser = await db.getUser(req.query.email);
+    if(getUser.length > 0)
+    {
+      console.log(getUser);
+      result.data = await db.getReviewsByUser(getUser[0].id_user);
+      result.status = 200;
+    }
+    else
+    {
+      result.msg = "email invalid!";
+    }
+  } catch (error) {
+    console.log(error);
+    result.msg = error; 
+  }
+
+  res.status(result.status).send(result);
+});
+
+router.get("/review/:id_gig", async function(req, res){
+  let result = {};
+  result.status = 401;
+  try {
+    result.data = await db.getReviewsBygig(req.params.id_gig);
+    result.status = 200;
+  } catch (error) {
+    console.log(error);
+    result.msg = error; 
+  }
+
+  res.status(result.status).send(result);
+});
+
+router.post("/review",[
+  body('id_user').not().isEmpty().withMessage('id_user tidak boleh kosong'),
+  body('id_gigs').not().isEmpty().withMessage('id_gigs tidak boleh kosong'),
+  body('rating').not().isEmpty().withMessage('rating tidak boleh kosong'),
+], async function(req, res){
+  let result = {};
+  result.status = 401;
+  let token = req.header("token");
+  let auth = await JWT.authToken(token);
+  if(auth.status >= 400) {
+      result = auth;
+  }
+  else {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      result.status = 400;
+      result.errors = errors.array();
+    }
+    else
+    {
+      let id_user = req.body.id_user; //user yg di review
+      let id_reviewer = auth.user.id_user; //yang kasih review
+      let id_gigs = req.body.id_gigs; //gig yg direview
+      let rating = req.body.rating; //rating 1-5
+      let comment = req.body.comment; //komentar
+      try {
+        await db.addReview(id_user, id_reviewer, id_gigs, rating, comment);
+        result.status = 200;
+      } catch (error) {
+        console.log(error);
+        result.msg = error; 
+      }
+    }
+  }
+  res.status(result.status).send(result);
 });
 
 
