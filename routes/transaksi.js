@@ -108,7 +108,7 @@ router.put("/finishOrder/:id_transaksi", async function(req, res){
 
 router.post("/createIpaymuLink", async function(req, res){
     //begitu buyer melewati tahap pembayaran, maka tambahkan transaksi ke database
-    let formDataString = `{"key":"9A6FC584-43C3-45C7-891E-CB8A2E197362","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"auto_redirect":"60","expired":"24","format":"json","ureturn":"${req.body.ureturn}","unotify":"${req.body.unotify}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
+    let formDataString = `{"key":"3434BDD4-6394-4EB1-B7C5-8773E007113C","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"auto_redirect":"60","expired":"24","format":"json","ureturn":"${req.body.ureturn}","unotify":"${req.body.unotify}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
     let link = await generateIpaymuLink(JSON.parse(formDataString));
     res.status(200).send(link);
 });
@@ -155,10 +155,13 @@ router.post("/afterIpaymu", async function(req, res){
 
 router.post("/testingIpaymu", async function(req, res){
     if(req.body){
-        res.status(200).send(req.body);
+        res.status(200).send("Body: "+req.body.status);
+    }
+    else if(req.query){
+        res.status(200).send("Query: "+req.query);
     }
     else{
-        res.status(200).send(req.query);
+        res.status(200).send("Other: "+req);
     }
 });
 
