@@ -11,7 +11,9 @@ CREATE TABLE user_table(
   photo_dir varchar(100),
   education text,
   alamat varchar(100),
-  negara varchar(30)
+  negara varchar(30),
+  jenis_rek varchar(30),
+  no_rek varchar(100)
 );
 
 CREATE TABLE gigs(
