@@ -100,7 +100,7 @@ CREATE TABLE transaksi(
 );
 
 CREATE TABLE transaksi_ipaymu(
-  sessionID varchar PRIMARY KEY NOT NULL,
+  sessionID varchar(100) NOT NULL,
   id_seller integer NOT NULL,
   id_buyer integer NOT NULL,
   id_gigs integer NOT NULL,

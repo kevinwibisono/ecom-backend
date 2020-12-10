@@ -108,7 +108,7 @@ router.put("/finishOrder/:id_transaksi", async function(req, res){
 
 router.post("/createIpaymuLink", async function(req, res){
     //begitu buyer melewati tahap pembayaran, maka tambahkan transaksi ke database
-    let formDataString = `{"key":"3434BDD4-6394-4EB1-B7C5-8773E007113C","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"auto_redirect":"60","expired":"24","format":"json","ureturn":"${req.body.ureturn}","unotify":"${req.body.unotify}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
+    let formDataString = `{"key":"3434BDD4-6394-4EB1-B7C5-8773E007113C","action":"payment","product[]":${req.body.products},"price[]":${req.body.prices},"quantity[]":${req.body.quantities},"auto_redirect":"60","expired":"24","format":"json","ureturn":"${req.body.ureturn}","buyer_name":"${req.body.buyer_name}","buyer_phone":"${req.body.buyer_phone}","buyer_email":"${req.body.buyer_email}"}`;
     let link = await generateIpaymuLink(JSON.parse(formDataString));
     res.status(200).send(link);
 });
@@ -132,37 +132,12 @@ router.post("/addIpaymu", async function(req, res){
 });
 
 router.post("/afterIpaymu", async function(req, res){
-    let errEncounter = false;
     let response = await db.executeQuery(`SELECT * FROM transaksi_ipaymu WHERE sessionID = '${req.body.sid}'`);
     let today = new Date();
     let tgl_transaksi = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
-    try {
-        await db.executeQuery(`INSERT INTO transaksi(id_seller, id_buyer, id_gigs, revision, revision_left, duration, tier_number, gigs_quantity, website_fee, extras, total, tgl_transaksi, status_transaksi) VALUES(${response[0].id_seller}, ${response[0].id_buyer}, ${response[0].id_gigs}, ${response[0].revision}, ${response[0].revision}, ${response[0].duration}, ${response[0].tier_number}, ${response[0].gigs_quantity}, ${response[0].website_fee}, '${response[0].extras}', ${response[0].total}, '${tgl_transaksi}', 1)`);
-    } catch (error) {
-        errEncounter = true;
-        res.status(400).send(error);
-    }
-    try {  
-        await db.executeQuery(`DELETE FROM transaksi_ipaymu WHERE sessionID = '${req.body.sid}'`);
-    } catch (error) {
-        errEncounter = true;
-        res.status(400).send(error);
-    }
-    if(!errEncounter){
-        res.status(200).send(req.body.status);
-    }
-});
-
-router.post("/testingIpaymu", async function(req, res){
-    if(req.body){
-        res.status(200).send("Body: "+req.body.status);
-    }
-    else if(req.query){
-        res.status(200).send("Query: "+req.query);
-    }
-    else{
-        res.status(200).send("Other: "+req);
-    }
+    await db.executeQuery(`INSERT INTO transaksi(id_seller, id_buyer, id_gigs, revision, revision_left, duration, tier_number, gigs_quantity, website_fee, extras, total, tgl_transaksi, status_transaksi) VALUES(${response[0].id_seller}, ${response[0].id_buyer}, ${response[0].id_gigs}, ${response[0].revision}, ${response[0].revision}, ${response[0].duration}, ${response[0].tier_number}, ${response[0].gigs_quantity}, ${response[0].website_fee}, '${response[0].extras}', ${response[0].total}, '${tgl_transaksi}', 1)`);
+    await db.executeQuery(`DELETE FROM transaksi_ipaymu WHERE sessionID = '${req.body.sid}'`);
+    res.status(200).send("Berhasil add transaksi");
 });
 
 module.exports = router;
