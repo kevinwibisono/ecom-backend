@@ -177,7 +177,7 @@ router.put("/beSeller", async function(req, res){
   let no_rek = req.body.no_rek;
   let jenis_rek = req.body.jenis_rek;
   if(bio == '' || skillset == '' || education == '' || no_rek == '' || jenis_rek == ''){
-    res.status(400).send('You Must At Least Includes Description, 1 Skill and 1 Education');
+    res.status(400).send('You Must At Least Includes Brief Description, 1 Skill, 1 Education and a Bank Account');
   }
   else{
     await db.executeQuery(`UPDATE user_table SET bio = '${bio}', skillset = '${skillset}', education = '${education}', no_rek = '${no_rek}', jenis_rek = '${jenis_rek}' WHERE id_user = ${id}`);
