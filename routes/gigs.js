@@ -242,7 +242,6 @@ router.post("/addSeen", async function(req, res){
   res.status(200).send('Seen Updated');
 });
 
-<<<<<<< HEAD
 router.get("/review", async function(req, res){
   let result = {};
   result.status = 401;
@@ -316,7 +315,8 @@ router.post("/review",[
     }
   }
   res.status(result.status).send(result);
-=======
+});
+
 router.get("/getRecommendation", async function(req, res){
   let toBeReturned = [];
   if(req.query.id_user){
@@ -357,7 +357,6 @@ router.get("/top5Reviewed", async function(req, res){
   let query = `SELECT g.id_gigs, g.judul, g.harga, p.directory_file, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, p.directory_file ORDER BY count(r.id_review) desc LIMIT 5;`;
   let response = await db.executeQuery(query);
   res.status(200).send(response);
->>>>>>> 8de6a766c53c58437a27598c21c90c974500df2a
 });
 
 
