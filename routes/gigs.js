@@ -284,6 +284,7 @@ router.get("/getRecommendation", async function(req, res){
       
       query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs ${relatedCategories} ${gigsException} and p.number = 1  group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama LIMIT ${limit};`;
       let responseCategories = await db.executeQuery(query);
+      gigsException += 'and ';
       responseCategories.forEach(r => {
         if(!gigsException.includes(`g.id_gigs <> ${r.id_gigs}`)){
           gigsException += `g.id_gigs <> ${r.id_gigs} and `
@@ -301,7 +302,7 @@ router.get("/getRecommendation", async function(req, res){
 
       //list semua id gigs yang belum termasuk di array
       if(gigsException != ''){
-        query = `SELECT id_gigs FROM gigs WHERE ${gigsException}`;
+        query = `SELECT g.id_gigs, u.nama FROM gigs g, user_table u WHERE g.id_user = u.id_user ${gigsException}`;
       }
       else{
         query = `SELECT id_gigs FROM gigs`;
