@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require('../db_helper');
 const multer = require('multer');
+const { all } = require("./gigs");
 let filename = '';
 
 function generateIpaymuLink(dataForm){
@@ -33,6 +34,56 @@ const storage=multer.diskStorage({
 const upload=multer({
   storage: storage
 }).single('file');
+
+router.get("/", async function(req, res){
+    let result = {};
+    result.status = 401;
+    try {
+        let allTrans = await db.getAllTrans();
+        for(let idx in allTrans) {
+            await db.getUserNama(allTrans[idx].id_buyer).then(res => {
+                allTrans[idx].id_buyer = res.nama;
+                allTrans[idx].jenis_rek = res.jenis_rek;
+                allTrans[idx].no_rek = res.no_rek;
+            });
+            await db.getUserNama(allTrans[idx].id_seller).then(res => {
+                allTrans[idx].id_seller = res.nama;
+                allTrans[idx].jenis_rek = res.jenis_rek;
+                allTrans[idx].no_rek = res.no_rek;
+            });
+            allTrans[idx].id_gigs = await db.getGigName(allTrans[idx].id_gigs);
+            allTrans[idx].action = allTrans[idx].id_transaksi;
+        }
+        result.data = allTrans;
+        result.status = 200;
+    } catch (error) {
+      console.log(error);
+      result.msg = error;
+    }
+    res.status(result.status).send(result);
+});
+
+router.post("/konfirmBayar", async function(req, res){
+    let result = {};
+    result.status = 401;
+    console.log("masuk");
+    console.log(req.body.id_trans);
+    try {
+        let id_trans = req.body.id_trans || '';
+        if(id_trans != '') {
+            await db.konfirmBayar(id_trans);
+            result.msg = "success";
+            result.status = 200;
+        }
+        else {
+            result.msg = "id transaksi tidak boleh kosong";
+        }
+    } catch (error) {
+        console.log(error);
+         result.msg = error;
+    }
+    res.status(result.status).send(result);
+});
 
 router.get("/list/:id_user/:type", async function(req, res){
     //dapatkan list transaksi dimana user terlibat

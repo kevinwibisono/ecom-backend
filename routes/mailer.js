@@ -10,8 +10,10 @@ router.post("/send", async function(req, res){
     let result = {};
     result.status = 401;
     let auth = await JWT.authToken(req.body.token);
+    console.log("masuk endpoint")
     if(auth.status >= 400) {
         result = auth;
+        console.log("JWT error");
     }
     else {
       let nama_user = req.body.nama;
@@ -24,7 +26,7 @@ router.post("/send", async function(req, res){
               pass: process.env.PASSWORD,
           }
       });
-      
+      console.log("berhasil createTransport")
       let mailOptions = {
           from: 'proyekecom.korian@gmail.com',
           to: `${email}`,
@@ -445,6 +447,7 @@ router.post("/send", async function(req, res){
               console.log("SUCCESS");
           }
       })
+      console.log("berhasil send")
     }
 
     res.status(200).send(result);

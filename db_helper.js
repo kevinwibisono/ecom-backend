@@ -21,6 +21,16 @@ async function getUser(email) {
   return result;
 }
 
+async function getUserNama(id_user) {
+  let result = await executeQuery(`SELECT nama, jenis_rek, no_rek from user_table where id_user = ${id_user}`);
+  return result[0];
+}
+
+async function getGigName(id_gigs) {
+  let result = await executeQuery(`SELECT judul from gigs where id_gigs = ${id_gigs}`);
+  return result[0].judul;
+}
+
 async function getAllSeller() {
   let result = await executeQuery(`SELECT id_user, nama, email from user_table where bio != ''`);
   return result;
@@ -82,7 +92,7 @@ async function getChats(id_room) {
 
 async function getReviewsByUser(id_user) {
   let result = await executeQuery(`
-  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at
+  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at, u.negara
   from reviews r, user_table u
   where r.id_reviewer = u.id_user and r.id_user = ${id_user}`);
   return result;
@@ -90,7 +100,7 @@ async function getReviewsByUser(id_user) {
 
 async function getReviewsBygig(id_gig) {
   let result = await executeQuery(`
-  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at
+  select r.id_review, u.nama, u.photo_dir, r.comment, r.rating, r.created_at, u.negara
   from reviews r, user_table u
   where r.id_reviewer = u.id_user and r.id_gigs = ${id_gig}`);
   return result;
@@ -101,6 +111,27 @@ async function addReview(id_user, id_reviewer, id_gigs, rating, comment) {
   let result = await executeQuery(`INSERT INTO 
   reviews(id_user, id_reviewer, id_gigs, rating, comment, created_at) 
   values('${id_user}', '${id_reviewer}', '${id_gigs}', '${rating}', '${comment}', now())`);
+  return result;
+}
+
+async function getAllTrans() {
+  let result = await executeQuery(`SELECT id_transaksi,
+  id_seller,
+  id_buyer,
+  id_gigs,
+  website_fee,
+  total,
+  tgl_transaksi,
+  status_transaksi,
+  tgl_accept,
+  tgl_target,
+  tgl_deliver,
+  tgl_selesai from transaksi`);
+  return result;
+}
+
+async function konfirmBayar(id_trans) {
+  let result = await executeQuery(`UPDATE transaksi set status_transaksi = 5 where id_transaksi = ${id_trans}`);
   return result;
 }
 
@@ -119,5 +150,9 @@ module.exports = {
   getAllSeller,
   addReview,
   getReviewsByUser,
-  getReviewsBygig
+  getReviewsBygig,
+  getAllTrans,
+  getUserNama,
+  getGigName,
+  konfirmBayar
 }
