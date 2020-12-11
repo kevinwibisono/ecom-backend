@@ -11,7 +11,9 @@ CREATE TABLE user_table(
   photo_dir varchar(100),
   education text,
   alamat varchar(100),
-  negara varchar(30)
+  negara varchar(30),
+  jenis_rek varchar(30),
+  no_rek varchar(100)
 );
 
 CREATE TABLE gigs(
@@ -98,7 +100,7 @@ CREATE TABLE transaksi(
 );
 
 CREATE TABLE transaksi_ipaymu(
-  sessionID varchar PRIMARY KEY NOT NULL,
+  sessionID varchar(100) NOT NULL,
   id_seller integer NOT NULL,
   id_buyer integer NOT NULL,
   id_gigs integer NOT NULL,

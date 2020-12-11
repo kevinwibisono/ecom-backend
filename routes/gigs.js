@@ -319,24 +319,126 @@ router.post("/review",[
 
 router.get("/getRecommendation", async function(req, res){
   let toBeReturned = [];
+  let limit = 12;
+  let relatedCategories = '';
+  let gigsException = '';
   if(req.query.id_user){
-    let query = `SELECT h.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from history_gigs h, gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and h.id_gigs = g.id_gigs and h.id_user = ${req.query.id_user} group by h.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY h.id_gigs desc LIMIT 12;`;
+    //jika ada id nya, maka pertama taruh gigs yang baru dilihat
+    let query = `SELECT h.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from history_gigs h, gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 and h.id_gigs = g.id_gigs and h.id_user = ${req.query.id_user} group by h.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama;`;
     let response = await db.executeQuery(query);
+    limit -= response.length;
     toBeReturned = response;
-    if(response.length < 12){
-      //jika tidak sampai 12, cari pengisinya
-      let limit = 12 - response.length;
-      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY g.id_gigs desc LIMIT ${limit};`;
-      response = await db.executeQuery(query);
-      response.forEach(element => {
-        toBeReturned.push(element);
+    //buat string gigs exception (gigs yang sdh ada di array sebelumnya)
+    toBeReturned.forEach(gig => {
+      if(!gigsException.includes(`g.id_gigs <> ${gig.id_gigs}`)){
+        if(gigsException == ''){
+          gigsException += `and g.id_gigs <> ${gig.id_gigs} and `
+        }
+        else{
+          gigsException += `g.id_gigs <> ${gig.id_gigs} and `
+        }
+      }
+    });
+    gigsException = gigsException.substr(0, gigsException.lastIndexOf('and'));
+
+    //jika tidak sampai 12 tetapi ada data
+    //cari gigs yang memiliki category yang sama
+    if(limit > 0 && toBeReturned.length >= 1){
+      toBeReturned.forEach(gig => {
+        if(!relatedCategories.includes(`g.category = ${gig.category}`)){
+          if(relatedCategories == ''){
+            relatedCategories += `and (g.category = ${gig.category} or `
+          }
+          else{
+            relatedCategories += `g.category = ${gig.category} or `
+          }
+        }
+      });
+      relatedCategories = relatedCategories.substr(0, relatedCategories.lastIndexOf('or'));
+      if(relatedCategories != ''){
+        //penutup untuk string gigs category (category-category yang sesuai dengan gigs di array)
+        relatedCategories += ")";
+      }
+      
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs ${relatedCategories} ${gigsException} and p.number = 1  group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama LIMIT ${limit};`;
+      let responseCategories = await db.executeQuery(query);
+      gigsException += 'and ';
+      responseCategories.forEach(r => {
+        if(!gigsException.includes(`g.id_gigs <> ${r.id_gigs}`)){
+          gigsException += `g.id_gigs <> ${r.id_gigs} and `
+        }
+        toBeReturned.push(r);
+        limit--;
+      });
+      gigsException = gigsException.substr(0, gigsException.lastIndexOf('and'));    
+    }  
+
+    if(limit > 0){
+      //jika limit masih belum 0, berarti belum 12 data
+      //maka sisanya random
+      let includedIds = ''; let arrayRandomId = [];
+
+      //list semua id gigs yang belum termasuk di array
+      if(gigsException != ''){
+        query = `SELECT g.id_gigs, u.nama FROM gigs g, user_table u WHERE g.id_user = u.id_user ${gigsException}`;
+      }
+      else{
+        query = `SELECT id_gigs FROM gigs`;
+      }
+      let responseIdsLeft = await db.executeQuery(query);
+      for (let index = 0; index < limit; index++) {
+        let randomIndex =  Math.round(Math.random()*(responseIdsLeft.length-1));       
+        while(arrayRandomId.indexOf(responseIdsLeft[randomIndex].id_gigs) != -1){
+          randomIndex =  Math.round(Math.random()*(responseIdsLeft.length-1));
+        }
+        arrayRandomId.push(responseIdsLeft[randomIndex].id_gigs);
+      }
+      arrayRandomId.forEach(id_randoman => {
+        if(includedIds == ''){
+          includedIds += `and (g.id_gigs = ${id_randoman} or `
+        }
+        else{
+          includedIds += `g.id_gigs = ${id_randoman} or `
+        }
+      });
+      includedIds = includedIds.substr(0, includedIds.lastIndexOf('or'));
+      includedIds += ")";
+      query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 ${includedIds} group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama LIMIT ${limit};`;
+      let responseRandom = await db.executeQuery(query);
+      responseRandom.forEach(r => {
+        toBeReturned.push(r);
       });
     }
   }
   else{
-    let query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1  group by g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama ORDER BY g.id_gigs desc LIMIT 12;`;
-    let response = await db.executeQuery(query);
-    toBeReturned = response;
+    //jika tidak ada user id, maka guest
+    //tampilkan seluruhnya random
+    let includedIds = ''; let arrayRandomId = [];
+
+    let query = `SELECT id_gigs FROM gigs`;
+    let responseIdsLeft = await db.executeQuery(query);
+    for (let index = 0; index < 12; index++) {
+      let randomIndex =  Math.round(Math.random()*(responseIdsLeft.length-1));       
+      while(arrayRandomId.indexOf(responseIdsLeft[randomIndex].id_gigs) != -1){
+        randomIndex =  Math.round(Math.random()*(responseIdsLeft.length-1));
+      }
+      arrayRandomId.push(responseIdsLeft[randomIndex].id_gigs);
+    }
+    arrayRandomId.forEach(id_randoman => {
+      if(includedIds == ''){
+        includedIds += `and (g.id_gigs = ${id_randoman} or `
+      }
+      else{
+        includedIds += `g.id_gigs = ${id_randoman} or `
+      }
+    });
+    includedIds = includedIds.substr(0, includedIds.lastIndexOf('or'));
+    includedIds += ")";
+    query = `SELECT g.id_gigs, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama, count(r.id_review) as reviews, avg(r.rating) as rating from gigs_pictures p, user_table u, gigs g left join reviews r on (r.id_gigs = g.id_gigs) where g.id_user = u.id_user and p.id_gigs = g.id_gigs and p.number = 1 ${includedIds} group by g.id_gigs, g.judul, g.judul, g.harga, g.category, g.sub_category, p.directory_file, u.nama LIMIT 12;`;
+    let responseRandom = await db.executeQuery(query);
+    responseRandom.forEach(r => {
+      toBeReturned.push(r);
+    });
   }
   res.status(200).send(toBeReturned);
 });
