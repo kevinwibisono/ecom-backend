@@ -4,16 +4,13 @@ const express = require("express");
 const router = express.Router();
 const JWT = require('./../auth');
 
-
-
 router.post("/send", async function(req, res){
     let result = {};
     result.status = 401;
     let auth = await JWT.authToken(req.body.token);
-    console.log("masuk endpoint")
+    result.msg = "masuk endpoint";
     if(auth.status >= 400) {
         result = auth;
-        console.log("JWT error");
     }
     else {
       let nama_user = req.body.nama;
@@ -26,7 +23,7 @@ router.post("/send", async function(req, res){
               pass: process.env.PASSWORD,
           }
       });
-      console.log("berhasil createTransport")
+      result.msg = "berhasil createTransport";
       let mailOptions = {
           from: 'proyekecom.korian@gmail.com',
           to: `${email}`,
@@ -443,14 +440,17 @@ router.post("/send", async function(req, res){
       transporter.sendMail(mailOptions, (err, data) => {
           if (err) {
               console.log("ERROR!", err);
+              result.msg = "error send";
+              result.error = err;
+              res.status(result.status).send(result);
           } else {
               console.log("SUCCESS");
+              result.msg = "success";
+              result.status = 200;
+              res.status(200).send(result);
           }
       })
-      console.log("berhasil send")
     }
-
-    res.status(200).send(result);
   });
 
 module.exports = router;
